@@ -24,7 +24,7 @@
     "http-errors": "~1.6.2",
     "jquery": "^3.4.1",
     "mongodb": "*",
-    "mongoose": "^5.6.4",
+    "mongoose": "^5.7.5",
     "morgan": "~1.9.0",
     "multer": "^1.4.1",
     "nodemon": "^1.19.1",
