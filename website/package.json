@@ -16,7 +16,7 @@
     "dotenv": "^8.0.0",
     "ejs": "^2.6.2",
     "express": "^4.16.4",
-    "express-fileupload": "^1.1.5",
+    "express-fileupload": "^1.1.9",
     "express-messages": "*",
     "express-session": "^1.16.2",
     "express-validator": "*",
