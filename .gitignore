@@ -1,2 +1,4 @@
 /website/public/uploads
 /eth
+website/node_modules
+node_modules/

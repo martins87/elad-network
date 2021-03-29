@@ -11,7 +11,7 @@ require('./passport')(passport)
 var expressValidator = require('express-validator')
 var LocalStrategy = require('passport-local').Strategy
 var bcrypt = require('bcrypt-nodejs')
-const mongoose = require('mongoose') // ok
+// const mongoose = require('mongoose') // ok
 const fileUpload = require('express-fileupload')
 
 // Property MongoDB model
@@ -19,17 +19,17 @@ const Property = require('./models/property')
 const User = require('./models/user')
 
 // database name: elad-network
-mongoose.connect('mongodb://admin:admin123@ds237267.mlab.com:37267/elad-network', {
-// mongoose.connect('mongodb://localhost:27017/elad-network', {
-  useNewUrlParser: true
-}, function(error) {
-  if(error) {
-    console.log('There was an error connecting to the database')
-    console.log(error)
-  } else {
-    console.log('We are connected to the database!')
-  }
-})
+// mongoose.connect('mongodb://admin:admin123@ds237267.mlab.com:37267/elad-network', {
+// // mongoose.connect('mongodb://localhost:27017/elad-network', {
+//   useNewUrlParser: true
+// }, function(error) {
+//   if(error) {
+//     console.log('There was an error connecting to the database')
+//     console.log(error)
+//   } else {
+//     console.log('We are connected to the database!')
+//   }
+// });
 
 function hashPassword(password) {
   return bcrypt.hashSync(password, bcrypt.genSaltSync(10))
@@ -39,7 +39,8 @@ function comparePassword(password, hash) {
     return bcrypt.compareSync(password, hash)
 }
 
-var app = express();
+const app = express();
+const port = process.env.PORT || 3000;
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -47,9 +48,9 @@ app.set('view engine', 'ejs');
 
 app.use(logger('dev'));
 
-app.use(bodyParser.json());
+app.use(express.json());
 // app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(express.urlencoded({extended: true}));
 
 app.use(fileUpload())
 
@@ -89,6 +90,7 @@ app.use(expressValidator({
 }));
 
 app.use(require('connect-flash')());
+
 app.use(function (req, res, next) {
   res.locals.messages = require('express-messages')(req, res);
   next();
@@ -104,26 +106,28 @@ app.get('/', function(req, res, next) {
     console.log('User: ', req.session.username)
   }
 
-  Property.countDocuments({}, (error, num) => {
-    if(error) {
-      console.log('There was a problem retrieving the properties from the database')
-      console.log(error)
-    } else {
-      console.log('Number of properties: ' + num)
-    }
-  })
+  res.render('index', { propertiesList: [], title: 'Properties' });
 
-  Property.find({}, function(error, properties) {
-      if(error) {
-          console.log('There was a problem retrieving the properties from the database')
-          console.log(error)
-      } else {
-          res.render('index', {
-              propertiesList: properties,
-              title: 'Properties'
-          })
-      }
-  })
+  // Property.countDocuments({}, (error, num) => {
+  //   if(error) {
+  //     console.log('There was a problem retrieving the properties from the database')
+  //     console.log(error)
+  //   } else {
+  //     console.log('Number of properties: ' + num)
+  //   }
+  // });
+
+  // Property.find({}, function(error, properties) {
+  //     if(error) {
+  //         console.log('There was a problem retrieving the properties from the database')
+  //         console.log(error)
+  //     } else {
+  //         res.render('index', {
+  //             propertiesList: properties,
+  //             title: 'Properties'
+  //         })
+  //     }
+  // });
 })
 
 app.get('/login', function(req, res, next) {
@@ -445,6 +449,10 @@ app.use(function(err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
   res.render('error');
+});
+
+app.listen(port, () => {
+  console.log(`ELAD Demo listening on port ${port}`);
 })
 
 module.exports = app
