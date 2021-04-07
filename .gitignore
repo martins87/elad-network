@@ -1,4 +1,6 @@
-/website/public/uploads
-/eth
+website/public/uploads
 website/node_modules
+website/.env
+eth/
 node_modules/
+images/
