@@ -166,13 +166,13 @@ app.post('/login', async (req, res) => {
             res.render('dashboard', {
                 title: 'Dashboard',
                 user: username
-            })
+            });
         } else {
             console.log('Password ' + password + ' is not valid!')
             res.render('login', {
                 title: 'Login',
                 msg: 'Wrong password'
-            })
+            });
         }
     } else {
         console.log('User NOT found');
@@ -218,7 +218,7 @@ app.post('/login', async (req, res) => {
     // });
 })
 
-app.post('/signup', (req, res) => {
+app.post('/signup', async (req, res) => {
     var data = req.body
 
     var fullname = data.fname
@@ -233,35 +233,62 @@ app.post('/signup', (req, res) => {
             msg: 'Passwords don\'t match'
         })
     } else {
-        User.findOne({
-            username: username//,
-            // password: password
-        }, (error, doc) => {
-            if (error) {
-                console.log('There was a problem retrieving the user from database')
-                console.log(error)
+        // MySQL database
+        const user = await db.selectUser(username);
+        if (user.length > 0) {
+            console.log(`User ${user[0].username} already exists`);
+
+            res.render('signup', {
+                title: 'Signup',
+                msg: 'Username already taken'
+            });
+        } else {
+            const newUser = await db.insertUser(fullname, username, hashPassword(password));
+
+            if (newUser.length > 0) {
+                console.log('User successfully created');
+    
+                res.render('success', { title: 'Successful Login' });
             } else {
-                if (doc) {
-                    console.log('Username already exists')
-                } else {
-                    // record new user
-                    User.create({
-                        fullname: fullname,
-                        username: username,
-                        password: hashPassword(password)
-                    }, (error, data) => {
-                        if (error) {
-                            console.log('There was a problem adding the user to the collection')
-                            console.log(error)
-                        } else {
-                            console.log('Data successfully added to the collection:')
-                            console.log(data)
-                            res.render('success', { title: 'Successful Login' });
-                        }
-                    })
-                }
+                console.log('There was an error trying to create user');
+
+                res.render('signup', {
+                    title: 'Signup',
+                    msg: 'There was an error trying to create user'
+                });
             }
-        })
+        }
+
+
+        // User.findOne({
+        //     username: username//,
+        //     // password: password
+        // }, (error, doc) => {
+        //     if (error) {
+        //         console.log('There was a problem retrieving the user from database')
+        //         console.log(error)
+        //     } else {
+        //         if (doc) {
+        //             console.log('Username already exists')
+        //         } else {
+        //             // record new user
+        //             User.create({
+        //                 fullname: fullname,
+        //                 username: username,
+        //                 password: hashPassword(password)
+        //             }, (error, data) => {
+        //                 if (error) {
+        //                     console.log('There was a problem adding the user to the collection')
+        //                     console.log(error)
+        //                 } else {
+        //                     console.log('Data successfully added to the collection:')
+        //                     console.log(data)
+        //                     res.render('success', { title: 'Successful Login' });
+        //                 }
+        //             })
+        //         }
+        //     }
+        // })
     }
 })
 
