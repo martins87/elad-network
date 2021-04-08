@@ -11,20 +11,25 @@ const expressValidator = require('express-validator');
 var bcrypt = require('bcrypt-nodejs');
 const mongoose = require('mongoose') // ok
 const fileUpload = require('express-fileupload');
+const db = require('./db/dbConnection');
 
 // Property MongoDB model
-const Property = require('./models/property')
-const User = require('./models/user')
+const Property = require('./db/models/property')
+const User = require('./db/models/user')
 
+// MySQL database
+db.connect();
+
+// MongoDB database
 // database name: elad-network
-const dbUrl = process.env.MONGO_DB_URL;
-mongoose.connect(dbUrl, { useNewUrlParser: true, useUnifiedTopology: true }, (err) => {
-    if (!err) {
-        console.log('Successfully connected to elad-network database');
-    } else {
-        console.log('Error in database connection: ' + JSON.stringify(err, undefined, 2));
-    }
-});
+// const dbUrl = process.env.MONGO_DB_URL;
+// mongoose.connect(dbUrl, { useNewUrlParser: true, useUnifiedTopology: true }, (err) => {
+//     if (!err) {
+//         console.log('Successfully connected to elad-network database');
+//     } else {
+//         console.log('Error in database connection: ' + JSON.stringify(err, undefined, 2));
+//     }
+// });
 
 function hashPassword(password) {
     return bcrypt.hashSync(password, bcrypt.genSaltSync(10))
@@ -42,13 +47,9 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 app.use(logger('dev'));
-
 app.use(express.json());
-// app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.urlencoded({ extended: true }));
-
 app.use(fileUpload())
-
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -92,7 +93,7 @@ app.use(function (req, res, next) {
 });
 
 // routing changes --- beginning 
-app.get('/', function (req, res, next) {
+app.get('/', async function (req, res, next) {
 
     // Checks if user is logged in
     if (typeof req.session.username === 'undefined') {
@@ -101,8 +102,12 @@ app.get('/', function (req, res, next) {
         console.log('User: ', req.session.username)
     }
 
-    res.render('index', { propertiesList: [], title: 'Properties' });
+    const properties = await db.selectProperties();
+    console.log('Number of properties: ', properties.length);
 
+    res.render('index', { propertiesList: properties, title: 'Properties' });
+
+    // MongoDB database
     // Property.countDocuments({}, (error, num) => {
     //   if(error) {
     //     console.log('There was a problem retrieving the properties from the database')

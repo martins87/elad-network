@@ -11,7 +11,7 @@ const connect = async () => {
     return connection;
 }
 
-connect();
+// connect();
 
 // TABLES
 // Property(name, price, address, token_symbol, total_supply, eth_price, description, base64_image)

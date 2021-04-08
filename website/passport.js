@@ -1,5 +1,5 @@
 var localStrategy = require('passport-local').Strategy
-var User = require('./models/user')
+var User = require('./db/models/user')
 var bcrypt = require('bcrypt-nodejs')
 
 function comparePassword(password, hash) {

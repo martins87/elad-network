@@ -267,26 +267,26 @@
                     <main>
                         <!-- introSlider -->
                         <section class="slick-fade slickSlider introSlider">
-                            <% for(let i = 0; i < propertiesList.length; i++) { %>
+                            <% for (let i = 0; i < propertiesList.length; i++) { %>
                                 <div>
                                 <!-- introSlide -->
-                                    <article class="introSlide bgCover" style="background-image: url(../uploads/<%= propertiesList[i].propertyImage %>);">
+                                    <article class="introSlide bgCover" style="background-image: url(data:image/webp;base64,<%= propertiesList[i].base64_image %>);">
                                         <div class="container introSlideHolder">
                                             <div class="align">
                                                 <!-- introSlideCaption -->
                                                 <div class="introSlideCaption">
-                                                    <h1 class="text-uppercase fontNeuron"><%= propertiesList[i].propertyName %></h1>
+                                                    <h1 class="text-uppercase fontNeuron"><%= propertiesList[i].name %></h1>
                                                     <div class="introSlideCaptionHolder">
                                                         <address class="text-primary">
                                                             <span class="icn"><i class="fi flaticon-pin-1"></i></span>
-                                                            <p><%= propertiesList[i].propertyAddress %></p>
+                                                            <p><%= propertiesList[i].address %></p>
                                                         </address>
                                                         <h2 class="fontNeuron">
-                                                            $ <%= propertiesList[i].propertyPrice.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,') %> <strong class="fwNormal textUnit">/ x Tokens Sold</strong>
+                                                            $ <%= propertiesList[i].price.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,') %> <strong class="fwNormal textUnit">/ x Tokens Sold</strong>
                                                         </h2>
-                                                        <div class="btnsWrap">
+                                                        <!-- <div class="btnsWrap">
                                                             <a href="/properties/<%=propertiesList[i]._id%>" class="btn btn-success btnSmall">See property</a>
-                                                        </div>
+                                                        </div> -->
                                                     </div>
                                                 </div>
                                             </div>
@@ -328,23 +328,24 @@
                                                         <div>
                                                             <div class="imgHolder">
                                                                 <a href="properties-single1.html">
-                                                                <img src="../uploads/<%= propertiesList[i].propertyImage %>" alt="image description" style="max-height:250px; min-height:250px">
+                                                                <img src="data:image/webp;base64,<%= propertiesList[i].base64_image %>" alt="image description" style="max-height:250px; min-height:250px">
                                                                 </a>
                                                             </div>
                                                         </div>
                                                         <!-- other images of the property here -->
                                                     </div>
                                                 </div>
-                                                <h2 class="fontNeuron text-capitalize"><a href="/properties/<%=propertiesList[i]._id%>"><%= propertiesList[i].propertyName %></a></h2>
+                                                <!-- <h2 class="fontNeuron text-capitalize"><a href="/properties/<%=propertiesList[i]._id%>"><%= propertiesList[i].name %></a></h2> -->
+                                                <h2 class="fontNeuron text-capitalize"><%= propertiesList[i].name %></h2>
                                                 <address>
                                                     <span class="icn"><i class="fi flaticon-pin-1"></i></span>
-                                                    <p><%= propertiesList[i].propertyAddress %></p>
+                                                    <p><%= propertiesList[i].address %></p>
                                                 </address>
-                                                <a href="/properties/<%=propertiesList[i]._id%>">
+                                                <!-- <a href="/properties/<%=propertiesList[i]._id%>">
                                                     <span class="btn btnSmall btn-success text-capitalize">See property</span>
-                                                </a>
+                                                </a> -->
                                                 <h3 class="fontNeuron fwSemi"><span class="textSecondary">
-                                                    $ <%= propertiesList[i].propertyPrice.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,') %></span>
+                                                    $ <%= propertiesList[i].price.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,') %></span>
                                                      <span class="textUnit fwNormal">/ monthly</span>
                                                 </h3>
                                                 <!-- postColumnFoot -->
