@@ -31,11 +31,11 @@ db.connect();
 //     }
 // });
 
-function hashPassword(password) {
+const hashPassword = (password) => {
     return bcrypt.hashSync(password, bcrypt.genSaltSync(10))
 }
 
-function comparePassword(password, hash) {
+const comparePassword = (password, hash) => {
     return bcrypt.compareSync(password, hash)
 }
 
@@ -46,7 +46,7 @@ const port = process.env.PORT || 3000;
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
-app.use(logger('dev'));
+// app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(fileUpload())
@@ -69,7 +69,7 @@ app.use(passport.session());
 
 // Validator
 app.use(expressValidator({
-    errorFormatter: function (param, msg, value) {
+    errorFormatter: (param, msg, value) => {
         var namespace = param.split('.')
             , root = namespace.shift()
             , formParam = root;
@@ -87,13 +87,13 @@ app.use(expressValidator({
 
 app.use(require('connect-flash')());
 
-app.use(function (req, res, next) {
+app.use((req, res, next) => {
     res.locals.messages = require('express-messages')(req, res);
     next();
 });
 
 // routing changes --- beginning 
-app.get('/', async function (req, res, next) {
+app.get('/', async (req, res, next) => {
 
     // Checks if user is logged in
     if (typeof req.session.username === 'undefined') {
@@ -117,7 +117,7 @@ app.get('/', async function (req, res, next) {
     //   }
     // });
 
-    // Property.find({}, function(error, properties) {
+    // Property.find({}, (error, properties) => {
     //     if(error) {
     //         console.log('There was a problem retrieving the properties from the database')
     //         console.log(error)
@@ -130,16 +130,16 @@ app.get('/', async function (req, res, next) {
     // });
 })
 
-app.get('/login', function (req, res, next) {
+app.get('/login', (req, res, next) => {
     res.render('login', { title: 'Login' });
 })
 
-app.get('/logout', function (req, res, next) {
+app.get('/logout', (req, res, next) => {
     req.session.username = undefined
     res.redirect('/')
 })
 
-app.get('/signup', function (req, res, next) {
+app.get('/signup', (req, res, next) => {
     res.render('signup', { title: 'Signup' })
 })
 
@@ -147,58 +147,78 @@ app.get('/success', (req, res) => {
     res.render('success')
 })
 
-// app.post('/login', passport.authenticate('local', {
-//   failureRedirect: '/login',
-//   successRedirect: '/dashboard'
-// }), function(req, res) {
-//   res.send('hey')
-// })
+app.post('/login', async (req, res) => {
+    console.log('Session:');
+    console.log(req.session);
 
-app.post('/login', function (req, res) {
-    console.log('Session:')
-    console.log(req.session)
+    var data = req.body;
 
-    var data = req.body
+    var username = data.uname;
+    var password = data.passwd;
 
-    var username = data.uname
-    var password = data.passwd
-
-    User.findOne({
-        username: username
-    }, function (error, doc) {
-        if (error) {
-            console.log('There was an error retrieving user from database')
-            console.log(error)
+    // MySQL database
+    const user = await db.selectUser(username);
+    if (user.length > 0) {
+        console.log('User found: ', user[0]);
+        if (comparePassword(password, user[0].password)) {
+            console.log('Password is valid! Login successful!')
+            req.session.username = username
+            res.render('dashboard', {
+                title: 'Dashboard',
+                user: username
+            })
         } else {
-            if (doc) {
-                // user found
-                console.log('User found: ', doc.username)
-                if (comparePassword(password, doc.password)) {
-                    console.log('Password is valid! Login successful!')
-                    req.session.username = doc.username
-                    res.render('dashboard', {
-                        title: 'Dashboard',
-                        user: username
-                    })
-                } else {
-                    console.log('Password ' + password + ' is not valid!')
-                    res.render('login', {
-                        title: 'Login',
-                        msg: 'Wrong password'
-                    })
-                }
-            } else {
-                console.log('Document not present in database')
-                res.render('login', {
-                    title: 'Login',
-                    msg: 'User not found'
-                })
-            }
+            console.log('Password ' + password + ' is not valid!')
+            res.render('login', {
+                title: 'Login',
+                msg: 'Wrong password'
+            })
         }
-    })
+    } else {
+        console.log('User NOT found');
+        res.render('login', {
+            title: 'Login',
+            msg: 'User not found'
+        });
+    }
+
+    // MongoDB database
+    // User.findOne({
+    //     username: username
+    // }, (error, doc) => {
+    //     if (error) {
+    //         console.log('There was an error retrieving user from database')
+    //         console.log(error)
+    //     } else {
+    //         if (doc) {
+    //             // user found
+    //             console.log('User found: ', doc.username)
+    //             if (comparePassword(password, doc.password)) {
+    //                 console.log('Password is valid! Login successful!')
+    //                 req.session.username = doc.username
+    //                 res.render('dashboard', {
+    //                     title: 'Dashboard',
+    //                     user: username
+    //                 })
+    //             } else {
+    //                 console.log('Password ' + password + ' is not valid!')
+    //                 res.render('login', {
+    //                     title: 'Login',
+    //                     msg: 'Wrong password'
+    //                 })
+    //             }
+    //         } else {
+    //             console.log('Document not present in database')
+    //             res.render('login', {
+    //                 title: 'Login',
+    //                 msg: 'User not found'
+    //             })
+    //         }
+    //     }
+    // });
 })
 
-app.post('/signup', function (req, res) {
+app.post('/signup', (req, res) => {
     var data = req.body
 
     var fullname = data.fname
@@ -216,7 +236,7 @@ app.post('/signup', function (req, res) {
         User.findOne({
             username: username//,
             // password: password
-        }, function (error, doc) {
+        }, (error, doc) => {
             if (error) {
                 console.log('There was a problem retrieving the user from database')
                 console.log(error)
@@ -229,7 +249,7 @@ app.post('/signup', function (req, res) {
                         fullname: fullname,
                         username: username,
                         password: hashPassword(password)
-                    }, function (error, data) {
+                    }, (error, data) => {
                         if (error) {
                             console.log('There was a problem adding the user to the collection')
                             console.log(error)
@@ -245,7 +265,7 @@ app.post('/signup', function (req, res) {
     }
 })
 
-app.get('/dashboard', function (req, res, next) {
+app.get('/dashboard', (req, res, next) => {
     // Checks if user is logged in. If not, redirects to login page.
     if (typeof req.session.username === 'undefined') {
         console.log('NOT LOGGED IN YET')
@@ -259,7 +279,7 @@ app.get('/dashboard', function (req, res, next) {
     }
 })
 
-app.get('/properties', function (req, res) {
+app.get('/properties', (req, res) => {
     // Checks if user is logged in. If not, redirects to login page.
     if (typeof req.session.username === 'undefined') {
         console.log('NOT LOGGED IN YET')
@@ -275,7 +295,7 @@ app.get('/properties', function (req, res) {
             }
         })
 
-        Property.find({}, function (error, properties) {
+        Property.find({}, (error, properties) => {
             if (error) {
                 console.log('There was a problem retrieving the properties from the database')
                 console.log(error)
@@ -290,7 +310,7 @@ app.get('/properties', function (req, res) {
     }
 })
 
-app.get('/properties/:id', function (req, res) {
+app.get('/properties/:id', (req, res) => {
     // Checks if user is logged in. If not, redirects to login page.
     if (typeof req.session.username === 'undefined') {
         console.log('NOT LOGGED IN YET')
@@ -299,7 +319,7 @@ app.get('/properties/:id', function (req, res) {
         console.log('User:', req.session.username)
         var id = req.params.id
 
-        Property.findById(id, function (error, foundProperty) {
+        Property.findById(id, (error, foundProperty) => {
             if (error) {
                 console.log("Couldn't find property with that id:")
             } else {
@@ -323,7 +343,7 @@ app.get('/properties/:id', function (req, res) {
     }
 })
 
-app.get('/create', function (req, res, next) {
+app.get('/create', (req, res, next) => {
     // Checks if user is logged in
     if (typeof req.session.username === 'undefined') {
         console.log('NOT LOGGED IN YET')
@@ -341,7 +361,7 @@ app.get('/create', function (req, res, next) {
 
 })
 
-app.get('/users', function (req, res) {
+app.get('/users', (req, res) => {
     // Checks if user is logged in
     if (typeof req.session.username === 'undefined') {
         console.log('NOT LOGGED IN YET')
@@ -362,7 +382,7 @@ app.get('/users', function (req, res) {
                 }
             })
 
-            User.find({}, function (error, users) {
+            User.find({}, (error, users) => {
                 if (error) {
                     console.log('There was a problem retrieving the properties from the database')
                     console.log(error)
@@ -378,7 +398,7 @@ app.get('/users', function (req, res) {
     }
 })
 
-app.get('/tokens', function (req, res, next) {
+app.get('/tokens', (req, res, next) => {
     // Checks if user is logged in
     if (typeof req.session.username === 'undefined') {
         console.log('NOT LOGGED IN YET')
@@ -399,7 +419,7 @@ app.post('/create-property', (req, res) => {
 
     var imageFile = req.files.propertyImage
 
-    imageFile.mv('public/uploads/' + imageFile.name, function (error) {
+    imageFile.mv('public/uploads/' + imageFile.name, (error) => {
         if (error) {
             console.log('Couldn\'t upload the image file')
             console.log(error)
@@ -417,7 +437,7 @@ app.post('/create-property', (req, res) => {
         ethPrice: data.ethPrice,
         propertyDescription: data.propertyDescription,
         propertyImage: imageFile.name
-    }, function (error, data) {
+    }, (error, data) => {
         if (error) {
             console.log('There was a problem adding a document to the collection')
             console.log(error)
@@ -436,12 +456,12 @@ app.get('*', (req, res) => {
 // routing changes --- end
 
 // catch 404 and forward to error handler
-app.use(function (req, res, next) {
+app.use((req, res, next) => {
     next(createError(404));
 });
 
 // error handler
-app.use(function (err, req, res, next) {
+app.use((err, req, res, next) => {
     // set locals, only providing error in development
     res.locals.message = err.message;
     res.locals.error = req.app.get('env') === 'development' ? err : {};

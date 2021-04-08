@@ -13,9 +13,7 @@ const connect = async () => {
 
 // connect();
 
-// TABLES
-// Property(name, price, address, token_symbol, total_supply, eth_price, description, base64_image)
-// User (fullname, username, password)
+// TABLE Property (name, price, address, token_symbol, total_supply, eth_price, description, base64_image)
 const selectProperties = async () => {
     const conn = await connect();
     const [rows] = await conn.query('SELECT * FROM Property;');
@@ -62,10 +60,28 @@ const deleteProperty = async () => {
     return await conn.query(sql, values);
 }
 
+// TABLE User (fullname, username, password)
+const selectUser = async (username) => {
+    const conn = await connect();
+    const sql = 'SELECT * FROM User WHERE username = ?';
+    const values = [username];
+    const [user] = await conn.query(sql, values);
+    return user;
+}
+
+const insertUser = async (fullname, username, password) => {
+    const conn = await connect();
+    const sql = 'INSERT INTO User (fullname, username, password) VALUES (?, ?, ?)';
+    const values = [fullname, username, password];
+    return await conn.query(sql, values);
+}
+
 module.exports = {
     connect,
     selectProperties,
     insertProperty,
     updateProperty,
-    deleteProperty
+    deleteProperty,
+    selectUser,
+    insertUser
 }
