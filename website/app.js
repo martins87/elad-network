@@ -259,7 +259,7 @@ app.post('/signup', async (req, res) => {
             }
         }
 
-
+        // MongoDB database
         // User.findOne({
         //     username: username//,
         //     // password: password
@@ -306,34 +306,46 @@ app.get('/dashboard', (req, res, next) => {
     }
 })
 
-app.get('/properties', (req, res) => {
+app.get('/properties', async (req, res) => {
     // Checks if user is logged in. If not, redirects to login page.
     if (typeof req.session.username === 'undefined') {
         console.log('NOT LOGGED IN YET')
         res.render('login', { title: 'Login' })
     } else {
-        console.log('User:', req.session.username)
-        Property.countDocuments({}, (error, num) => {
-            if (error) {
-                console.log('There was a problem retrieving the properties from the database')
-                console.log(error)
-            } else {
-                console.log('Number of properties: ' + num)
-            }
-        })
+        console.log('User:', req.session.username);
 
-        Property.find({}, (error, properties) => {
-            if (error) {
-                console.log('There was a problem retrieving the properties from the database')
-                console.log(error)
-            } else {
-                res.render('properties', {
-                    propertiesList: properties,
-                    title: 'Properties',
-                    user: req.session.username
-                })
-            }
-        })
+        // MySQL database
+        const properties = await db.selectProperties();
+        console.log('Number of properties: ', properties.length);
+
+        res.render('properties', {
+            propertiesList: properties,
+            title: 'Properties',
+            user: req.session.username
+        });
+
+        // MongoDB database
+        // Property.countDocuments({}, (error, num) => {
+        //     if (error) {
+        //         console.log('There was a problem retrieving the properties from the database')
+        //         console.log(error)
+        //     } else {
+        //         console.log('Number of properties: ' + num)
+        //     }
+        // })
+
+        // Property.find({}, (error, properties) => {
+        //     if (error) {
+        //         console.log('There was a problem retrieving the properties from the database')
+        //         console.log(error)
+        //     } else {
+        //         res.render('properties', {
+        //             propertiesList: properties,
+        //             title: 'Properties',
+        //             user: req.session.username
+        //         })
+        //     }
+        // })
     }
 })
 
