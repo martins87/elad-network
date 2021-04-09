@@ -31,9 +31,10 @@ const selectProperties = async () => {
 
 const insertProperty = async (property) => {
     const conn = await connect();
-    const sql = `INSERT INTO Property (name, price, address, token_symbol, total_supply, eth_price, description, image_filename)
-                 VALUES (?,?,?,?,?,?,?,?)`;
+    const sql = `INSERT INTO Property (id, name, price, address, token_symbol, total_supply, eth_price, description, image_filename)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
     const values = [
+        property.id,
         property.name,
         property.price,
         property.address,

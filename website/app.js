@@ -466,6 +466,7 @@ app.post('/create-property', async (req, res) => {
         var data = req.body;
         var imageFile = req.files.propertyImage;
         var newProperty = {
+            id: uniqid(),
             name: data.propertyName,
             price: data.propertyPrice,
             address: data.propertyAddress,
