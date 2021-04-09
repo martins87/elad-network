@@ -13,7 +13,7 @@ const connect = async () => {
 
 connect();
 
-// TABLE Property (name, price, address, token_symbol, total_supply, eth_price, description, base64_image)
+// TABLE Property (name, price, address, token_symbol, total_supply, eth_price, description, image_filename)
 const selectProperties = async () => {
     const conn = await connect();
     const [rows] = await conn.query('SELECT * FROM Property;');
@@ -22,7 +22,7 @@ const selectProperties = async () => {
 
 const insertProperty = async () => {
     const conn = await connect();
-    const sql = `INSERT INTO Property (name, price, address, token_symbol, total_supply, eth_price, description, base64_image)
+    const sql = `INSERT INTO Property (name, price, address, token_symbol, total_supply, eth_price, description, image_filename)
                  VALUES (?,?,?,?,?,?,?,?)`;
     const values = [
         '2 bedroom flat in St Leonard\'s Terrace',
@@ -43,7 +43,7 @@ const insertProperty = async () => {
 
 const updateProperty = async () => {
     const conn = await connect();
-    const sql = `UPDATE Property SET name=?, price=?, address=?, token_symbol=?, total_supply=?, eth_price=?, description=?, base64_image=?`;
+    const sql = `UPDATE Property SET name=?, price=?, address=?, token_symbol=?, total_supply=?, eth_price=?, description=?, image_filename=?`;
     const values = [
         '1 bedroom apartment',
         '5000000',

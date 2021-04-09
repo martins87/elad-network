@@ -270,7 +270,7 @@
                             <% for (let i = 0; i < propertiesList.length; i++) { %>
                                 <div>
                                 <!-- introSlide -->
-                                    <article class="introSlide bgCover" style="background-image: url(data:image/webp;base64,<%= propertiesList[i].base64_image %>);">
+                                    <article class="introSlide bgCover" style="background-image: url(../uploads/<%= propertiesList[i].image_filename %>">
                                         <div class="container introSlideHolder">
                                             <div class="align">
                                                 <!-- introSlideCaption -->
@@ -328,7 +328,7 @@
                                                         <div>
                                                             <div class="imgHolder">
                                                                 <a href="properties-single1.html">
-                                                                <img src="data:image/webp;base64,<%= propertiesList[i].base64_image %>" alt="image description" style="max-height:250px; min-height:250px">
+                                                                <img src="../uploads/<%= propertiesList[i].image_filename %>" alt="image description" style="max-height:250px; min-height:250px">
                                                                 </a>
                                                             </div>
                                                         </div>

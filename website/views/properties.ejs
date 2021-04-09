@@ -17,13 +17,13 @@
                 <% for(let i = 0; i < propertiesList.length; i++) { %>
                   <div class="col-md-4 p-2">
                     <div class="card bg-white" style="width: 20rem; height:400px; max-height:450px; min-height:450px">
-                      <img class="card-img-top" src="data:image/webp;base64,<%= propertiesList[i].base64_image %>" alt="Card image cap">
+                      <img class="card-img-top" src="../uploads/<%= propertiesList[i].image_filename %>" alt="Card image cap">
                       <div class="card-body">
                         <h2 class="card-title"><%= propertiesList[i].name %></h2>
                         <span id="propertyAddress"></span>
                         <!--<p class="card-text"><%= propertiesList[i].description%></p>-->
                         <p>
-                          <img src="../uploads/pin.png" class="img-fluid" alt="Responsive image" width="13px">&nbsp;
+                          <img src="../assets/img/icons/pin.png" class="img-fluid" alt="Responsive image" width="13px">&nbsp;
                           <%= propertiesList[i].address %>
                         </p>
                         <h1 style="color:#000099">$<%= propertiesList[i].price.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,') %></h1>

@@ -2,20 +2,21 @@ const createError = require('http-errors');
 const express = require('express'); // ok
 const path = require('path'); // ok
 const cookieParser = require('cookie-parser');
-const logger = require('morgan');
+// const logger = require('morgan');
 const session = require('express-session'); // ok
 const passport = require('passport'); // ok
 require('./passport')(passport);
 require('dotenv').config();
 const expressValidator = require('express-validator');
 var bcrypt = require('bcrypt-nodejs');
-const mongoose = require('mongoose') // ok
+// const mongoose = require('mongoose');
 const fileUpload = require('express-fileupload');
+
 const db = require('./db/dbConnection');
 
 // Property MongoDB model
-const Property = require('./db/models/property')
-const User = require('./db/models/user')
+// const Property = require('./db/models/property')
+// const User = require('./db/models/user')
 
 // MySQL database
 db.connect();
@@ -347,7 +348,7 @@ app.get('/properties', async (req, res) => {
         //     }
         // })
     }
-})
+});
 
 app.get('/properties/:id', (req, res) => {
     // Checks if user is logged in. If not, redirects to login page.
@@ -380,7 +381,7 @@ app.get('/properties/:id', (req, res) => {
             }
         })
     }
-})
+});
 
 app.get('/create', (req, res, next) => {
     // Checks if user is logged in
@@ -390,15 +391,14 @@ app.get('/create', (req, res, next) => {
     } else {
         console.log('User: ', req.session.username)
 
-        // Checks if user has access to create property page
+        // Checks if user has permission to create property page
         if (req.session.username != 'admin') {
             res.render('dashboard', { title: 'Dashboard', user: req.session.username });
         } else {
             res.render('create', { title: 'Create Property', user: req.session.username });
         }
     }
-
-})
+});
 
 app.get('/users', (req, res) => {
     // Checks if user is logged in
@@ -435,7 +435,7 @@ app.get('/users', (req, res) => {
             })
         }
     }
-})
+});
 
 app.get('/tokens', (req, res, next) => {
     // Checks if user is logged in
@@ -446,47 +446,55 @@ app.get('/tokens', (req, res, next) => {
         console.log('User: ', req.session.username)
         res.render('tokens', { title: 'Property Tokens', user: req.session.username })
     }
-})
+});
 
 app.post('/create-property', (req, res) => {
-    if (req.session.username) {
-        console.log('Achamos a sessão em create-property!')
-        console.log(req.session.username)
+    // Checks if user is logged in. If not, redirects to login page.
+    if (typeof req.session.username === 'undefined') {
+        console.log('NOT LOGGED IN YET')
+        res.render('login', { title: 'Login' })
+    } else {
+        var data = req.body
+        var imageFile = req.files.propertyImage
+
+        console.log('req data:', data);
+        console.log('image file:', imageFile);
+
+        // imageFile.mv('public/uploads/' + imageFile.name, (error) => {
+        //     if (error) {
+        //         console.log('Couldn\'t upload the image file')
+        //         console.log(error)
+        //     } else {
+        //         console.log('Image file successfully uploaded')
+        //     }
+        // });
+
+        // MySQL database
+        // ...
+    
+        // MongoDB database
+        // Property.create({
+        //     propertyName: data.propertyName,
+        //     propertyPrice: data.propertyPrice,
+        //     propertyAddress: data.propertyAddress,
+        //     tokenSymbol: data.tokenSymbol,
+        //     totalSupply: data.totalSupply,
+        //     ethPrice: data.ethPrice,
+        //     propertyDescription: data.propertyDescription,
+        //     propertyImage: imageFile.name
+        // }, (error, data) => {
+        //     if (error) {
+        //         console.log('There was a problem adding a document to the collection')
+        //         console.log(error)
+        //     } else {
+        //         console.log('Data successfully added to the collection')
+        //         console.log(data)
+        //     }
+        // })
+    
+        res.redirect('properties');
     }
 
-    var data = req.body
-
-    var imageFile = req.files.propertyImage
-
-    imageFile.mv('public/uploads/' + imageFile.name, (error) => {
-        if (error) {
-            console.log('Couldn\'t upload the image file')
-            console.log(error)
-        } else {
-            console.log('Image file successfully uploaded')
-        }
-    })
-
-    Property.create({
-        propertyName: data.propertyName,
-        propertyPrice: data.propertyPrice,
-        propertyAddress: data.propertyAddress,
-        tokenSymbol: data.tokenSymbol,
-        totalSupply: data.totalSupply,
-        ethPrice: data.ethPrice,
-        propertyDescription: data.propertyDescription,
-        propertyImage: imageFile.name
-    }, (error, data) => {
-        if (error) {
-            console.log('There was a problem adding a document to the collection')
-            console.log(error)
-        } else {
-            console.log('Data successfully added to the collection')
-            console.log(data)
-        }
-    })
-
-    res.redirect('properties')
 })
 
 app.get('*', (req, res) => {
