@@ -83,10 +83,10 @@ const selectUser = async (username) => {
     return user;
 }
 
-const insertUser = async (fullname, username, password) => {
+const insertUser = async ({id, fullname, username, password}) => {
     const conn = await connect();
-    const sql = 'INSERT INTO User (fullname, username, password) VALUES (?, ?, ?)';
-    const values = [fullname, username, password];
+    const sql = 'INSERT INTO User (id, fullname, username, password) VALUES (?, ?, ?, ?)';
+    const values = [id, fullname, username, password];
     return await conn.query(sql, values);
 }
 

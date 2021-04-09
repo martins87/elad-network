@@ -11,6 +11,7 @@ const expressValidator = require('express-validator');
 var bcrypt = require('bcrypt-nodejs');
 // const mongoose = require('mongoose');
 const fileUpload = require('express-fileupload');
+const uniqid = require('uniqid');
 
 const db = require('./db/dbConnection');
 
@@ -220,7 +221,7 @@ app.post('/login', async (req, res) => {
 })
 
 app.post('/signup', async (req, res) => {
-    var data = req.body
+    var data = req.body;
 
     var fullname = data.fname
     var username = data.uname
@@ -234,6 +235,14 @@ app.post('/signup', async (req, res) => {
             msg: 'Passwords don\'t match'
         })
     } else {
+        var newUser = {
+            id: uniqid(),
+            fullname: fullname,
+            username: username,
+            password: hashPassword(password)
+        };
+        console.log('New user:', newUser);
+
         // MySQL database
         const user = await db.selectUser(username);
         if (user.length > 0) {
@@ -244,9 +253,9 @@ app.post('/signup', async (req, res) => {
                 msg: 'Username already taken'
             });
         } else {
-            const newUser = await db.insertUser(fullname, username, hashPassword(password));
+            const response = await db.insertUser(newUser);
 
-            if (newUser.length > 0) {
+            if (response.length > 0) {
                 console.log('User successfully created');
     
                 res.render('success', { title: 'Successful Login' });
@@ -481,6 +490,19 @@ app.post('/create-property', async (req, res) => {
         // MySQL database
         const response = await db.insertProperty(newProperty);
         console.log('Response from dbConnection:', response);
+
+        if (response.length > 0) {
+            console.log('Property successfully listed');
+
+            res.redirect('properties');
+        } else {
+            console.log('There was an error trying to create user');
+
+            res.render('create', {
+                title: 'Create property',
+                msg: 'There was an error trying to list a property'
+            });
+        }
     
         // MongoDB database
         // Property.create({
@@ -502,20 +524,19 @@ app.post('/create-property', async (req, res) => {
         //     }
         // })
     
-        res.redirect('properties');
+        // res.redirect('properties');
     }
-
-})
+});
 
 app.get('*', (req, res) => {
     res.render('404', { title: 'Page not found' })
-})
+});
 // routing changes --- end
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
     next(createError(404));
-});
+});;
 
 // error handler
 app.use((err, req, res, next) => {
@@ -530,6 +551,6 @@ app.use((err, req, res, next) => {
 
 app.listen(port, () => {
     console.log(`ELAD Demo listening on port ${port}`);
-})
+});
 
-module.exports = app
+module.exports = app;
