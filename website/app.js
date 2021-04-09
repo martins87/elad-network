@@ -448,29 +448,39 @@ app.get('/tokens', (req, res, next) => {
     }
 });
 
-app.post('/create-property', (req, res) => {
+app.post('/create-property', async (req, res) => {
     // Checks if user is logged in. If not, redirects to login page.
     if (typeof req.session.username === 'undefined') {
         console.log('NOT LOGGED IN YET')
         res.render('login', { title: 'Login' })
     } else {
-        var data = req.body
-        var imageFile = req.files.propertyImage
+        var data = req.body;
+        var imageFile = req.files.propertyImage;
+        var newProperty = {
+            name: data.propertyName,
+            price: data.propertyPrice,
+            address: data.propertyAddress,
+            token_symbol: data.tokenSymbol,
+            total_supply: data.totalSupply,
+            eth_price: data.ethPrice,
+            description: data.propertyDescription,
+            image_filename: imageFile.name
+        };
 
-        console.log('req data:', data);
-        console.log('image file:', imageFile);
+        console.log('New property:', newProperty);
 
-        // imageFile.mv('public/uploads/' + imageFile.name, (error) => {
-        //     if (error) {
-        //         console.log('Couldn\'t upload the image file')
-        //         console.log(error)
-        //     } else {
-        //         console.log('Image file successfully uploaded')
-        //     }
-        // });
+        imageFile.mv('public/uploads/' + imageFile.name, (error) => {
+            if (error) {
+                console.log('Couldn\'t upload the image file')
+                console.log(error)
+            } else {
+                console.log('Image file successfully uploaded')
+            }
+        });
 
         // MySQL database
-        // ...
+        const response = await db.insertProperty(newProperty);
+        console.log('Response from dbConnection:', response);
     
         // MongoDB database
         // Property.create({

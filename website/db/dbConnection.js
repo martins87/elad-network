@@ -13,27 +13,37 @@ const connect = async () => {
 
 // connect();
 
-// TABLE Property (name, price, address, token_symbol, total_supply, eth_price, description, image_filename)
+/* TABLE Property
+ * - name varchar(60)
+ * - price varchar(10)
+ * - address varchar(100)
+ * - token_symbol varchar(10)
+ * - total_supply varchar(20)
+ * - eth_price varchar(20)
+ * - description varchar(600)
+ * - image_filename varchar(500)
+ */
 const selectProperties = async () => {
     const conn = await connect();
     const [rows] = await conn.query('SELECT * FROM Property;');
     return rows;
 }
 
-const insertProperty = async () => {
+const insertProperty = async (property) => {
     const conn = await connect();
     const sql = `INSERT INTO Property (name, price, address, token_symbol, total_supply, eth_price, description, image_filename)
                  VALUES (?,?,?,?,?,?,?,?)`;
     const values = [
-        '1 bedroom apartment',
-        '5000000',
-        'Thackeray Street, Kensington, W8',
-        'KEN',
-        '3500',
-        '1',
-        'A tasteful-presented 1 bedroom 1st-floor apartment set within a convenient location very close to all the amenities of the Kensington High St & the famous Hyde Park. The property features 400 sq ft in size and is offered on a furnished basis.',
-        '1_bedroom_apartment.png'
+        property.name,
+        property.price,
+        property.address,
+        property.token_symbol,
+        '3500', //property.total_supply,
+        '1', //property.eth_price,
+        property.description,
+        property.image_filename
     ];
+
     return await conn.query(sql, values);
 }
 
@@ -60,7 +70,11 @@ const deleteProperty = async () => {
     return await conn.query(sql, values);
 }
 
-// TABLE User (fullname, username, password)
+/* TABLE User
+ * - fullname varchar(60)
+ * - username varchar(30)
+ * - password varchar(100)
+ */
 const selectUser = async (username) => {
     const conn = await connect();
     const sql = 'SELECT * FROM User WHERE username = ?';
