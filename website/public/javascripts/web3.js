@@ -1,5 +1,6 @@
 
 // var accountAddress
+// https://github.com/martins87/notarization/blob/master/notarization-backend/ethers-test.js
 
 window.addEventListener('load', async () => {
     if (window.ethereum) {

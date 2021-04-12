@@ -1,0 +1,3 @@
+CREATE TABLE `elad-network`.`Property` ( `id` varchar(30), `name` VARCHAR(60) NOT NULL , `price` VARCHAR(10) NOT NULL , `address` VARCHAR(100) NOT NULL , `token_symbol` VARCHAR(10) NOT NULL , `total_supply` VARCHAR(20) NOT NULL , `eth_price` VARCHAR(20) NOT NULL , `description` VARCHAR(600) NOT NULL , `image_filename` VARCHAR(255) NOT NULL, PRIMARY KEY (`id`)) ENGINE = MyISAM;
+
+CREATE TABLE `elad-network`.`User` ( `id` varchar(30), `fullname` VARCHAR(60) NOT NULL , `username` VARCHAR(30) NOT NULL , `password` VARCHAR(100) NOT NULL, PRIMARY KEY (`id`)) ENGINE = MyISAM;
