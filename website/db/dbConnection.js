@@ -14,6 +14,7 @@ const connect = async () => {
 // connect();
 
 /* TABLE Property
+ * - id varchar(30)
  * - name varchar(60)
  * - price varchar(10)
  * - address varchar(100)
@@ -26,6 +27,14 @@ const connect = async () => {
 const selectProperties = async () => {
     const conn = await connect();
     const [rows] = await conn.query('SELECT * FROM Property;');
+    return rows;
+}
+
+const selectPropertyById = async (id) => {
+    const conn = await connect();
+    const sql = 'SELECT * FROM Property WHERE id = ?';
+    const values = [id];
+    const [rows] = await conn.query(sql, values);
     return rows;
 }
 
@@ -72,6 +81,7 @@ const deleteProperty = async () => {
 }
 
 /* TABLE User
+ * - id varchar(30)
  * - fullname varchar(60)
  * - username varchar(30)
  * - password varchar(100)
@@ -94,6 +104,7 @@ const insertUser = async ({id, fullname, username, password}) => {
 module.exports = {
     connect,
     selectProperties,
+    selectPropertyById,
     insertProperty,
     updateProperty,
     deleteProperty,

@@ -27,8 +27,8 @@
                           <%= propertiesList[i].address %>
                         </p>
                         <h1 style="color:#000099">$<%= propertiesList[i].price.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,') %></h1>
-                          <!-- <a class="btn btn-success align-bottom" href="/properties/<%=propertiesList[i]._id%>">See property</a> -->
-                        <!--<a href="/properties/<%=propertiesList[i]._id%>" class="btn btn-success">See property</a>-->
+                        <!-- <a class="btn btn-success align-bottom" href="/properties/<%=propertiesList[i].id%>">See property</a> -->
+                        <a href="/properties/<%=propertiesList[i].id%>" class="btn btn-success">See property</a>
                       </div>
                     </div>
                   </div>

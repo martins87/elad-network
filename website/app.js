@@ -359,36 +359,55 @@ app.get('/properties', async (req, res) => {
     }
 });
 
-app.get('/properties/:id', (req, res) => {
+app.get('/properties/:id', async (req, res) => {
     // Checks if user is logged in. If not, redirects to login page.
     if (typeof req.session.username === 'undefined') {
-        console.log('NOT LOGGED IN YET')
-        res.render('login', { title: 'Login' })
+        console.log('NOT LOGGED IN YET');
+        res.render('login', { title: 'Login' });
     } else {
-        console.log('User:', req.session.username)
-        var id = req.params.id
+        console.log('User:', req.session.username);
+        var id = req.params.id;
 
-        Property.findById(id, (error, foundProperty) => {
-            if (error) {
-                console.log("Couldn't find property with that id:")
-            } else {
-                // console.log('Property found:')
-                // console.log(foundProperty)
+        // MySQL database
+        const property = await db.selectPropertyById(id);
+        
+        if (property.length > 0) {
+            res.render('property', {
+                propertyName: property[0].name,
+                propertyPrice: property[0].price,
+                propertyAddress: property[0].address,
+                tokenSymbol: property[0].token_symbol,
+                totalSupply: property[0].total_supply,
+                ethPrice: property[0].eth_price,
+                propertyDescription: property[0].description,
+                propertyImage: property[0].image_filename,
+                title: 'Property',
+                user: req.session.username
+            });
+        }
 
-                res.render('property', {
-                    propertyName: foundProperty.propertyName,
-                    propertyPrice: foundProperty.propertyPrice,
-                    propertyAddress: foundProperty.propertyAddress,
-                    tokenSymbol: foundProperty.tokenSymbol,
-                    totalSupply: foundProperty.totalSupply,
-                    ethPrice: foundProperty.ethPrice,
-                    propertyDescription: foundProperty.propertyDescription,
-                    propertyImage: foundProperty.propertyImage,
-                    title: 'Property',
-                    user: req.session.username
-                })
-            }
-        })
+        // MongoDB database
+        // Property.findById(id, (error, foundProperty) => {
+        //     if (error) {
+        //         console.log("Couldn't find property with that id:")
+        //     } else {
+        //         // console.log('Property found:')
+        //         // console.log(foundProperty)
+
+        //         res.render('property', {
+        //             propertyName: foundProperty.propertyName,
+        //             propertyPrice: foundProperty.propertyPrice,
+        //             propertyAddress: foundProperty.propertyAddress,
+        //             tokenSymbol: foundProperty.tokenSymbol,
+        //             totalSupply: foundProperty.totalSupply,
+        //             ethPrice: foundProperty.ethPrice,
+        //             propertyDescription: foundProperty.propertyDescription,
+        //             propertyImage: foundProperty.propertyImage,
+        //             title: 'Property',
+        //             user: req.session.username
+        //         })
+        //     }
+        // })
     }
 });
 
@@ -530,7 +549,7 @@ app.post('/create-property', async (req, res) => {
 });
 
 app.get('*', (req, res) => {
-    res.render('404', { title: 'Page not found' })
+    res.render('404', { title: 'Page not found', message: 'Oh no! Page not found.' });
 });
 // routing changes --- end
 
@@ -547,7 +566,8 @@ app.use((err, req, res, next) => {
 
     // render the error page
     res.status(err.status || 500);
-    res.render('error');
+    // res.render('error');
+    res.render('404', { title: 'Request error', message: 'Some error ocurred.' });
 });
 
 app.listen(port, () => {
