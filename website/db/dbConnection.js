@@ -86,6 +86,12 @@ const deleteProperty = async () => {
  * - username varchar(30)
  * - password varchar(100)
  */
+const selectUsers = async () => {
+    const conn = await connect();
+    const [rows] = await conn.query('SELECT * FROM User;');
+    return rows;
+}
+
 const selectUser = async (username) => {
     const conn = await connect();
     const sql = 'SELECT * FROM User WHERE username = ?';
@@ -108,6 +114,7 @@ module.exports = {
     insertProperty,
     updateProperty,
     deleteProperty,
+    selectUsers,
     selectUser,
     insertUser
 }

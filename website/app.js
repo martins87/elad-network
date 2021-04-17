@@ -428,39 +428,54 @@ app.get('/create', (req, res, next) => {
     }
 });
 
-app.get('/users', (req, res) => {
+app.get('/users', async (req, res) => {
     // Checks if user is logged in
     if (typeof req.session.username === 'undefined') {
         console.log('NOT LOGGED IN YET')
         res.render('login', { title: 'Login' })
     } else {
-        console.log('User: ', req.session.username)
+        console.log('User: ', req.session.username);
 
         // Checks if user has access to users page
         if (req.session.username != 'admin') {
             res.render('dashboard', { title: 'Dashboard', user: req.session.username });
         } else {
-            User.countDocuments({}, (error, num) => {
-                if (error) {
-                    console.log('There was a problem retrieving the properties from the database')
-                    console.log(error)
-                } else {
-                    console.log('Number of users: ' + num)
-                }
-            })
+            // MySQL database
+            const users = await db.selectUsers();
+            console.log('Number of users: ', users.length);
 
-            User.find({}, (error, users) => {
-                if (error) {
-                    console.log('There was a problem retrieving the properties from the database')
-                    console.log(error)
-                } else {
-                    res.render('users', {
-                        users: users,
-                        title: 'Users',
-                        user: req.session.username
-                    })
-                }
-            })
+            if (users.length > 0) {
+                res.render('users', {
+                    users: users,
+                    title: 'Users',
+                    user: req.session.username
+                })
+            } else {
+                res.render('404', { title: 'No users', message: 'No users were found.' });
+            }
+
+            // MongoDB database
+            // User.countDocuments({}, (error, num) => {
+            //     if (error) {
+            //         console.log('There was a problem retrieving the properties from the database')
+            //         console.log(error)
+            //     } else {
+            //         console.log('Number of users: ' + num)
+            //     }
+            // })
+
+            // User.find({}, (error, users) => {
+            //     if (error) {
+            //         console.log('There was a problem retrieving the properties from the database')
+            //         console.log(error)
+            //     } else {
+            //         res.render('users', {
+            //             users: users,
+            //             title: 'Users',
+            //             user: req.session.username
+            //         })
+            //     }
+            // })
         }
     }
 });

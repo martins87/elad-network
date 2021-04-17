@@ -1,7 +1,8 @@
+// var account = web3.toChecksumAddress(web3.eth.accounts[0])
+var account = window.userAccount;
+console.log('[createProperty.js] window.userAccount:', account);
 
-var account = web3.toChecksumAddress(web3.eth.accounts[0])
-
-const latest = web3.eth.getBlockNumber()
+// const latest = web3.eth.getBlockNumber()
 
 // Factory Contract
 var factoryABI = web3.eth.contract([
