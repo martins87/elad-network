@@ -5,26 +5,14 @@
 })();
 
 const provider = new ethers.providers.Web3Provider(window.ethereum);
-// const signer = provider.getSigner();
-// console.log('signer:', signer);
 
 const loadAccountAndBalance = () => {
     provider.listAccounts().then(accounts => {
-        $('#accountAddress').text(accounts[0]);
-    
-        if (!window.userAccount) {
-            window.userAccount = accounts[0];
-        }
-    
-        var userAccount = document.getElementById('accountAddress').innerText || window.account;
+        var userAccount = accounts[0];
+        $('#accountAddress').text(userAccount);
     
         provider.getBalance(userAccount).then(balance => {
             var userBalance = +ethers.utils.formatEther(balance);
-    
-            if (!window.userBalance) {
-                window.userBalance = userBalance;
-            }
-            
             $('#accountBalance').text(userBalance.toFixed(4) + ' ETH');
         });
     
