@@ -104,10 +104,16 @@ app.get('/', async (req, res, next) => {
         console.log('User: ', req.session.username)
     }
 
-    const properties = await db.selectProperties();
-    console.log('Number of properties: ', properties.length);
-
-    res.render('index', { propertiesList: properties, title: 'Properties' });
+    try {
+        const properties = await db.selectProperties();
+        console.log('Number of properties: ', properties.length);
+    
+        res.render('index', { propertiesList: properties, title: 'Properties' });
+    } catch (error) {
+        let message = 'Error fetching properties';
+        console.log(`${message}:`, error);
+        res.render('404', { title: 'Error', message: `${message}.` });
+    }
 
     // MongoDB database
     // Property.countDocuments({}, (error, num) => {
@@ -130,7 +136,7 @@ app.get('/', async (req, res, next) => {
     //         })
     //     }
     // });
-})
+});
 
 app.get('/login', (req, res, next) => {
     res.render('login', { title: 'Login' });
@@ -158,31 +164,38 @@ app.post('/login', async (req, res) => {
     var username = data.uname;
     var password = data.passwd;
 
-    // MySQL database
-    const user = await db.selectUser(username);
-    if (user.length > 0) {
-        console.log('User found: ', user[0]);
-        if (comparePassword(password, user[0].password)) {
-            console.log('Password is valid! Login successful!')
-            req.session.username = username
-            res.render('dashboard', {
-                title: 'Dashboard',
-                user: username
-            });
+    try {
+        // MySQL database
+        const user = await db.selectUser(username);
+        if (user.length > 0) {
+            console.log('User found: ', user[0]);
+            if (comparePassword(password, user[0].password)) {
+                console.log('Password is valid! Login successful!')
+                req.session.username = username
+                res.render('dashboard', {
+                    title: 'Dashboard',
+                    user: username
+                });
+            } else {
+                console.log('Password ' + password + ' is not valid!')
+                res.render('login', {
+                    title: 'Login',
+                    msg: 'Wrong password'
+                });
+            }
         } else {
-            console.log('Password ' + password + ' is not valid!')
+            console.log('User NOT found');
             res.render('login', {
                 title: 'Login',
-                msg: 'Wrong password'
+                msg: 'User not found'
             });
         }
-    } else {
-        console.log('User NOT found');
-        res.render('login', {
-            title: 'Login',
-            msg: 'User not found'
-        });
+    } catch (error) {
+        let message = 'Error on login';
+        console.log(`${message}:`, error);
+        res.render('404', { title: 'Login error', message: `${message}.` });
     }
+
 
     // MongoDB database
     // User.findOne({
@@ -243,31 +256,38 @@ app.post('/signup', async (req, res) => {
         };
         console.log('New user:', newUser);
 
-        // MySQL database
-        const user = await db.selectUser(username);
-        if (user.length > 0) {
-            console.log(`User ${user[0].username} already exists`);
-
-            res.render('signup', {
-                title: 'Signup',
-                msg: 'Username already taken'
-            });
-        } else {
-            const response = await db.insertUser(newUser);
-
-            if (response.length > 0) {
-                console.log('User successfully created');
+        try {
+            // MySQL database
+            const user = await db.selectUser(username);
+            if (user.length > 0) {
+                console.log(`User ${user[0].username} already exists`);
     
-                res.render('success', { title: 'Successful Login' });
-            } else {
-                console.log('There was an error trying to create user');
-
                 res.render('signup', {
                     title: 'Signup',
-                    msg: 'There was an error trying to create user'
+                    msg: 'Username already taken'
                 });
+            } else {
+                const response = await db.insertUser(newUser);
+    
+                if (response.length > 0) {
+                    console.log('User successfully created');
+        
+                    res.render('success', { title: 'Successful Login' });
+                } else {
+                    console.log('There was an error trying to create user');
+    
+                    res.render('signup', {
+                        title: 'Signup',
+                        msg: 'There was an error trying to create user'
+                    });
+                }
             }
+        } catch (error) {
+            let message = 'Error on signup';
+            console.log(`${message}:`, error);
+            res.render('404', { title: 'Signup error', message: `${message}.` });
         }
+
 
         // MongoDB database
         // User.findOne({
@@ -324,15 +344,21 @@ app.get('/properties', async (req, res) => {
     } else {
         console.log('User:', req.session.username);
 
-        // MySQL database
-        const properties = await db.selectProperties();
-        console.log('Number of properties: ', properties.length);
-
-        res.render('properties', {
-            propertiesList: properties,
-            title: 'Properties',
-            user: req.session.username
-        });
+        try {
+            // MySQL database
+            const properties = await db.selectProperties();
+            console.log('Number of properties: ', properties.length);
+    
+            res.render('properties', {
+                propertiesList: properties,
+                title: 'Properties',
+                user: req.session.username
+            });
+        } catch (error) {
+            let message = 'Error listing properties';
+            console.log(`${message}:`, error);
+            res.render('404', { title: 'Error', message: `${message}.` });
+        }
 
         // MongoDB database
         // Property.countDocuments({}, (error, num) => {
@@ -368,22 +394,28 @@ app.get('/properties/:id', async (req, res) => {
         console.log('User:', req.session.username);
         var id = req.params.id;
 
-        // MySQL database
-        const property = await db.selectPropertyById(id);
-        
-        if (property.length > 0) {
-            res.render('property', {
-                propertyName: property[0].name,
-                propertyPrice: property[0].price,
-                propertyAddress: property[0].address,
-                tokenSymbol: property[0].token_symbol,
-                totalSupply: property[0].total_supply,
-                ethPrice: property[0].eth_price,
-                propertyDescription: property[0].description,
-                propertyImage: property[0].image_filename,
-                title: 'Property',
-                user: req.session.username
-            });
+        try {
+            // MySQL database
+            const property = await db.selectPropertyById(id);
+            
+            if (property.length > 0) {
+                res.render('property', {
+                    propertyName: property[0].name,
+                    propertyPrice: property[0].price,
+                    propertyAddress: property[0].address,
+                    tokenSymbol: property[0].token_symbol,
+                    totalSupply: property[0].total_supply,
+                    ethPrice: property[0].eth_price,
+                    propertyDescription: property[0].description,
+                    propertyImage: property[0].image_filename,
+                    title: 'Property',
+                    user: req.session.username
+                });
+            }
+        } catch (error) {
+            let message = `Error listing property #${id}`;
+            console.log(`${message}:`, error);
+            res.render('404', { title: 'Error', message: `${message}.` });
         }
 
         // MongoDB database
@@ -440,18 +472,25 @@ app.get('/users', async (req, res) => {
         if (req.session.username != 'admin') {
             res.render('dashboard', { title: 'Dashboard', user: req.session.username });
         } else {
-            // MySQL database
-            const users = await db.selectUsers();
-            console.log('Number of users: ', users.length);
 
-            if (users.length > 0) {
-                res.render('users', {
-                    users: users,
-                    title: 'Users',
-                    user: req.session.username
-                })
-            } else {
-                res.render('404', { title: 'No users', message: 'No users were found.' });
+            try {
+                // MySQL database
+                const users = await db.selectUsers();
+                console.log('Number of users: ', users.length);
+    
+                if (users.length > 0) {
+                    res.render('users', {
+                        users: users,
+                        title: 'Users',
+                        user: req.session.username
+                    })
+                } else {
+                    res.render('404', { title: 'No users', message: 'No users were found.' });
+                }
+            } catch (error) {
+                let message = 'Error fetching users';
+                console.log(`${message}:`, error);
+                res.render('404', { title: 'No users', message: `${message}.` });
             }
 
             // MongoDB database
@@ -522,21 +561,27 @@ app.post('/create-property', async (req, res) => {
             }
         });
 
-        // MySQL database
-        const response = await db.insertProperty(newProperty);
-        console.log('Response from dbConnection:', response);
-
-        if (response.length > 0) {
-            console.log('Property successfully listed');
-
-            res.redirect('properties');
-        } else {
-            console.log('There was an error trying to create user');
-
-            res.render('create', {
-                title: 'Create property',
-                msg: 'There was an error trying to list a property'
-            });
+        try {
+            // MySQL database
+            const response = await db.insertProperty(newProperty);
+            console.log('Response from dbConnection:', response);
+    
+            if (response.length > 0) {
+                console.log('Property successfully listed');
+    
+                res.redirect('properties');
+            } else {
+                console.log('There was an error trying to create user');
+    
+                res.render('create', {
+                    title: 'Create property',
+                    msg: 'There was an error trying to list a property'
+                });
+            }
+        } catch (error) {
+            let message = 'Error listing a property';
+            console.log(`${message}:`, error);
+            res.render('404', { title: 'Error', message: `${message}.` });
         }
     
         // MongoDB database
