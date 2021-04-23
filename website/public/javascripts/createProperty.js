@@ -1,94 +1,33 @@
-// var account = web3.toChecksumAddress(web3.eth.accounts[0])
-var account = window.userAccount;
-console.log('[createProperty.js] window.userAccount:', account);
+// A Web3Provider wraps a standard Web3 provider, which is
+// what Metamask injects as window.ethereum into each page
+(async () => {
+    await window.ethereum.enable();
+})();
 
-// const latest = web3.eth.getBlockNumber()
+var account = document.getElementById('accountAddress').innerHTML;
+var balance = document.getElementById('accountBalance').innerHTML;
+console.log('[createProperty.js] account:', account);
+console.log('[createProperty.js] balance:', balance);
 
 // Factory Contract
-var factoryABI = web3.eth.contract([
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"name": "tokens",
-		"outputs": [
-			{
-				"name": "",
-				"type": "address"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [],
-		"name": "totalTokens",
-		"outputs": [
-			{
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"name": "_symbol",
-				"type": "string"
-			},
-			{
-				"name": "_name",
-				"type": "string"
-			},
-			{
-				"name": "_supplyOfTokens",
-				"type": "uint256"
-			},
-			{
-				"name": "_owner",
-				"type": "address"
-			}
-		],
-		"name": "createProperty",
-		"outputs": [
-			{
-				"name": "",
-				"type": "address"
-			}
-		],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": false,
-				"name": "_contract",
-				"type": "address"
-			}
-		],
-		"name": "NewToken",
-		"type": "event"
+const FACTORY_CONTRACT_ADDRESS = "0x62C58DA52c86c6Fc5722F1893960eaB9C28d3b5A"; // ropsten
+const factoryABI = [
+	'function createProperty(string memory _symbol, string memory _name, uint256 _supplyOfTokens, address payable _owner) public returns (address)',
+	'function totalTokens() public view returns(uint256)'
+];
+const factoryInstance = new ethers.Contract(FACTORY_CONTRACT_ADDRESS, factoryABI, provider);
+
+const getTotalTokens = async () => {
+	try {
+		const total = await factoryInstance.totalTokens();
+		console.log('[createProperty] # of tokens created:', total.toString());
+		return total;
+	} catch (error) {
+		console.log('Error reading from contract:', error);
 	}
-])
+}
 
-// var factoryAddress = "0x50f16ed6f353668c94f7be1ac7b802be08f453f5" // kovan
-// var factoryAddress = "0x2d42d87bfb8fe08f7a2c2ecc33762fef538ef871" // local blockchain
-var factoryAddress = "0x1b29c2c052818b77f4fcb8556baa038626009a68" // ropsten
-
-var factory = factoryABI.at(factoryAddress)
+getTotalTokens();
 
 function createProperty() {
     var symbol = $('#_tokenSymbol').val()
