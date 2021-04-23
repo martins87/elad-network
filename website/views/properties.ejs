@@ -24,7 +24,7 @@
                         <!--<p class="card-text"><%= propertiesList[i].description%></p>-->
                         <p>
                           <img src="../assets/img/icons/pin.png" class="img-fluid" alt="Responsive image" width="13px">&nbsp;
-                          <%= propertiesList[i].address %>
+                          <%= propertiesList[i].address.length > 30 ? propertiesList[i].address.substring(0,30) + '...' : propertiesList[i].address %>
                         </p>
                         <h1 style="color:#000099">$<%= propertiesList[i].price.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,') %></h1>
                         <!-- <a class="btn btn-success align-bottom" href="/properties/<%=propertiesList[i].id%>">See property</a> -->
