@@ -5,11 +5,10 @@
 })();
 
 // Provider from Metamask
-// const provider = new ethers.providers.Web3Provider(window.ethereum);
+const provider = new ethers.providers.Web3Provider(window.ethereum);
 // Provider from Ropsten
-const provider = new ethers.getDefaultProvider('ropsten');
-
 // const provider = new ethers.getDefaultProvider('ropsten');
+
 const FACTORY_CONTRACT_ADDRESS = "0x62C58DA52c86c6Fc5722F1893960eaB9C28d3b5A"; // ropsten
 const factoryABI = [
 	'function createProperty(string memory _symbol, string memory _name, uint256 _supplyOfTokens, address payable _owner) public returns (address)',
@@ -28,3 +27,22 @@ const getTotalTokens = async () => {
 }
 
 getTotalTokens();
+
+const createProperty = async (symbol, tokenName, supply, owner) => {
+	try {
+		const signer = provider.getSigner();
+		const writeInstance = new ethers.Contract(FACTORY_CONTRACT_ADDRESS, factoryABI, signer);
+		const txResponse = await writeInstance.createProperty(symbol, tokenName, supply, owner);
+		const txReceipt = await txResponse.wait();
+		console.log('Receipt:', txReceipt);
+	} catch (error) {
+		console.log('Error writing to contract:', error);
+	}
+}
+
+const symbol = 'DAN';
+const tokenName = 'Daniel Token';
+const supply = '4101987';
+const owner = '0x937e85Dd15E69d17796C6C4B07f5d76e46d144Ba';
+
+// createProperty(symbol, tokenName, supply, owner);
