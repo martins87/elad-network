@@ -4,41 +4,52 @@
     await window.ethereum.enable();
 })();
 
-var account = document.getElementById('accountAddress').innerHTML;
-var balance = document.getElementById('accountBalance').innerHTML;
-console.log('[createProperty.js] account:', account);
-console.log('[createProperty.js] balance:', balance);
+var userAccount;
+var userBalance;
+
+(() => {
+    provider.listAccounts().then(accounts => {
+        userAccount = accounts[0];
+		console.log('[createProperty.js] account:', userAccount);
+    
+        provider.getBalance(userAccount).then(balance => {
+            userBalance = +ethers.utils.formatEther(balance);
+			console.log('[createProperty.js] balance:', userBalance);
+        });
+    });
+})();
+
+console.log('[createProperty.js] account:', userAccount);
+console.log('[createProperty.js] balance:', userBalance);
 
 // Factory Contract
-const FACTORY_CONTRACT_ADDRESS = "0x62C58DA52c86c6Fc5722F1893960eaB9C28d3b5A"; // ropsten
-const factoryABI = [
-	'function createProperty(string memory _symbol, string memory _name, uint256 _supplyOfTokens, address payable _owner) public returns (address)',
-	'function totalTokens() public view returns(uint256)'
-];
-const factoryInstance = new ethers.Contract(FACTORY_CONTRACT_ADDRESS, factoryABI, provider);
-
-const getTotalTokens = async () => {
-	try {
-		const total = await factoryInstance.totalTokens();
-		console.log('[createProperty] # of tokens created:', total.toString());
-		return total;
-	} catch (error) {
-		console.log('Error reading from contract:', error);
-	}
+const factoryContract = {
+	address: "0x62C58DA52c86c6Fc5722F1893960eaB9C28d3b5A", // Ropsten
+	ABI: [
+		'function createProperty(string memory _symbol, string memory _name, uint256 _supplyOfTokens, address payable _owner) public returns (address)',
+		'function totalTokens() public view returns(uint256)'
+	]
 }
+const factoryInstance = new ethers.Contract(factoryContract.address, factoryContract.ABI, provider);
 
-getTotalTokens();
-
-function createProperty() {
+function create() {
     var symbol = $('#_tokenSymbol').val()
     var name = $('#_propertyName').val()
-	var supply = $('#_propertyPrice').val()
-	// var supply = $('#_totalSupply').val()
+	// var price = $('#_propertyPrice').val()
+	var supply = $('#_totalSupply').val();
+	var owner = account;
 	// var priceEth = $('#_ethPrice').val()
 
 	var address = $('#_propertyAddress').val()
 	var description = $('#_propertyDescription').val()
 	var image = $('#imageInput').val()
+
+	console.log('Symbol:', symbol);
+	console.log('Name:', name);
+	console.log('Supply:', supply);
+	console.log('Owner:', owner);
+
+	return;
 
 	var isDataValid = validateFields(symbol, name, supply, address, description, image)
 
@@ -47,6 +58,18 @@ function createProperty() {
 		createToken(symbol, name, supply, account);
 	} else {
 		return
+	}
+}
+
+const createProperty = async (symbol, tokenName, supply, owner) => {
+	try {
+		const signer = new ethers.providers.Web3Provider(window.ethereum).getSigner();
+		const writeInstance = new ethers.Contract(FACTORY_CONTRACT_ADDRESS, factoryABI, signer);
+		const txResponse = await writeInstance.createProperty(symbol, tokenName, supply, owner);
+		const txReceipt = await txResponse.wait();
+		console.log('Receipt:', txReceipt);
+	} catch (error) {
+		console.log('Error writing to contract:', error);
 	}
 }
 
@@ -100,15 +123,3 @@ function createToken(symbol, name, supply, owner) {
 		}
     })
 }
-
-// watch for contract events since last block
-// what we want here is the next event emitted, which is the contract creation
-// factory.allEvents({
-//     fromBlock: latest
-// }, (error, event) => {
-//     if (true) {
-// 		console.log(event.args._contract);
-// 		window.alert('Token created!')
-// 		window.location = "/properties";
-//     }
-// });

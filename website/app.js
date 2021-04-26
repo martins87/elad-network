@@ -531,6 +531,7 @@ app.get('/tokens', (req, res, next) => {
 });
 
 app.post('/create-property', async (req, res) => {
+    return;
     // Checks if user is logged in. If not, redirects to login page.
     if (typeof req.session.username === 'undefined') {
         console.log('NOT LOGGED IN YET')

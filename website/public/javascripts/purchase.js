@@ -8,12 +8,14 @@ var account = document.getElementById('accountAddress').innerHTML;
 console.log('[createProperty.js] account:', account);
 
 // Factory Contract
-const FACTORY_CONTRACT_ADDRESS = "0x62C58DA52c86c6Fc5722F1893960eaB9C28d3b5A"; // ropsten
-const factoryABI = [
-	'function createProperty(string memory _symbol, string memory _name, uint256 _supplyOfTokens, address payable _owner) public returns (address)',
-	'function totalTokens() public view returns(uint256)'
-];
-const factoryInstance = new ethers.Contract(FACTORY_CONTRACT_ADDRESS, factoryABI, provider);
+const factoryContract = {
+	address: "0x62C58DA52c86c6Fc5722F1893960eaB9C28d3b5A", // Ropsten
+	ABI: [
+		'function createProperty(string memory _symbol, string memory _name, uint256 _supplyOfTokens, address payable _owner) public returns (address)',
+		'function totalTokens() public view returns(uint256)'
+	]
+}
+const factoryInstance = new ethers.Contract(factoryContract.address, factoryContract.ABI, provider);
 
 // Property Token
 var propertyTokenABI = new ethers.Contract()
