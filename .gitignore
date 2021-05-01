@@ -1,6 +1,4 @@
-website/public/uploads
-website/node_modules
-website/.env
-eth/
+public/uploads
 node_modules/
-images/
+.env
+.gitignore
