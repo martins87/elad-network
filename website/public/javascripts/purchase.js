@@ -9,10 +9,11 @@ console.log('[createProperty.js] account:', account);
 
 // Factory Contract
 const factoryContract = {
-	address: "0x62C58DA52c86c6Fc5722F1893960eaB9C28d3b5A", // Ropsten
+	address: "0xe8F28BaFb98C37a09374EDcB67f020Ccdb8FCC9E", // Ropsten
 	ABI: [
 		'function createProperty(string memory _symbol, string memory _name, uint256 _supplyOfTokens, address payable _owner) public returns (address)',
-		'function totalTokens() public view returns(uint256)'
+		'function totalTokens() public view returns(uint256)',
+		'function getTokenAddress(uint8 index) public view returns (address)'
 	]
 }
 const factoryInstance = new ethers.Contract(factoryContract.address, factoryContract.ABI, provider);

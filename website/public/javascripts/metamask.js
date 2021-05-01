@@ -6,15 +6,17 @@
 
 // Provider from Metamask
 const provider = new ethers.providers.Web3Provider(window.ethereum);
-// Provider from Ropsten
-// const provider = new ethers.getDefaultProvider('ropsten');
 
-const FACTORY_CONTRACT_ADDRESS = "0x62C58DA52c86c6Fc5722F1893960eaB9C28d3b5A"; // ropsten
-const factoryABI = [
-	'function createProperty(string memory _symbol, string memory _name, uint256 _supplyOfTokens, address payable _owner) public returns (address)',
-	'function totalTokens() public view returns(uint256)'
-];
-const factoryInstance = new ethers.Contract(FACTORY_CONTRACT_ADDRESS, factoryABI, provider);
+// Factory Contract
+const factoryContract = {
+	address: "0xe8F28BaFb98C37a09374EDcB67f020Ccdb8FCC9E", // Ropsten
+	ABI: [
+		'function createProperty(string memory _symbol, string memory _name, uint256 _supplyOfTokens, address payable _owner) public returns (address)',
+		'function totalTokens() public view returns(uint256)',
+		'function getTokenAddress(uint8 index) public view returns (address)'
+	]
+}
+const factoryInstance = new ethers.Contract(factoryContract.address, factoryContract.ABI, provider);
 
 const getTotalTokens = async () => {
 	try {
