@@ -26,11 +26,9 @@ var userBalance;
 (() => {
     provider.listAccounts().then(accounts => {
         userAccount = accounts[0];
-		console.log('[createProperty.js] account:', userAccount);
-    
+		
         provider.getBalance(userAccount).then(balance => {
-            userBalance = +ethers.utils.formatEther(balance);
-			console.log('[createProperty.js] balance:', userBalance);
+			userBalance = +ethers.utils.formatEther(balance);
         });
     });
 })();
@@ -405,14 +403,13 @@ const loadPropertyTokens = async () => {
 				'function buyTokens() public payable',
 				'function myBalance() public view returns (uint balance)',
 				'function tokensLeft() public view returns(uint256)',
-				'function propertyDetails() public view returns(string memory, string memory, uint256, uint256, uint256)',
-				'fallback () external payable'
+				'function propertyDetails() public view returns(string memory, string memory, uint256, uint256, uint256)'
 			]
 		}
 		const propertyTokenInstance = new ethers.Contract(propertyTokenContract.address, propertyTokenContract.ABI, provider);
 
 		// finally we get data from each token
-		// const details = await propertyTokenInstance.propertyDetails();
+		const details = await propertyTokenInstance.propertyDetails();
 
 		// populate table with token details
 		var table = document.getElementById("tokensTable");
@@ -424,13 +421,15 @@ const loadPropertyTokens = async () => {
 		var cell4 = row.insertCell(4);
 
 		var parsedData = details;
-		var name = parsedData[0];
-		var symbol = parsedData[1];
-		var totalSupply = formatNumber(parsedData[2].c[0]);
-		var tokensBought = formatNumber(parsedData[3].c[0]);
-		var tokensLeft = formatNumber(parsedData[4].c[0]);
+		console.log('Details: ', parsedData);
+
+		var tokenName = parsedData[0];
+		var tokenSymbol = parsedData[1];
+		var totalSupply = ethers.utils.formatEther(parsedData[2]); // formatNumber(parsedData[2].c[0]);
+		var tokensBought = ethers.utils.formatEther(parsedData[3]); // formatNumber(parsedData[3].c[0]);
+		var tokensLeft = ethers.utils.formatEther(parsedData[4]); // formatNumber(parsedData[4].c[0]);
 		
-		cell0.innerHTML = name + ' (' + symbol + ')';
+		cell0.innerHTML = tokenName + ' (' + tokenSymbol + ')';
 		cell1.innerHTML = totalSupply;
 		cell2.innerHTML = tokensBought;
 		cell3.innerHTML = tokensLeft;
