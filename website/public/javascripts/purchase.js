@@ -18,7 +18,7 @@ const factoryContract = {
 const factoryInstance = new ethers.Contract(factoryContract.address, factoryContract.ABI, provider);
 
 // Property Token
-var propertyTokenABI = new ethers.Contract()
+var propertyTokenABI = ['']
 
 var propertyTokenAddress
 
