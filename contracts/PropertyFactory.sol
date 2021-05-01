@@ -1,7 +1,9 @@
-pragma solidity >=0.5.0 <0.6.0;
+pragma solidity >=0.8.0;
 
-import "https://github.com/OpenZeppelin/openzeppelin-solidity/blob/master/contracts/math/SafeMath.sol";
-import "https://github.com/OpenZeppelin/openzeppelin-solidity/blob/master/contracts/token/ERC20/IERC20.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/math/SafeMath.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/IERC20.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/extensions/IERC20Metadata.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/Context.sol";
 
 contract PropertyToken is IERC20 {
     using SafeMath for uint256;
@@ -29,14 +31,14 @@ contract PropertyToken is IERC20 {
     /**
      * @dev See `IERC20.totalSupply`.
      */
-    function totalSupply() public view returns (uint256) {
+    function totalSupply() public view override returns (uint256) {
         return _totalSupply;
     }
 
     /**
      * @dev See `IERC20.balanceOf`.
      */
-    function balanceOf(address account) public view returns (uint256) {
+    function balanceOf(address account) public view override returns (uint256) {
         return _balances[account];
     }
 
@@ -48,7 +50,7 @@ contract PropertyToken is IERC20 {
      * - `recipient` cannot be the zero address.
      * - the caller must have a balance of at least `amount`.
      */
-    function transfer(address recipient, uint256 amount) public returns (bool) {
+    function transfer(address recipient, uint256 amount) public override returns (bool) {
         _transfer(msg.sender, recipient, amount);
         return true;
     }
@@ -56,7 +58,7 @@ contract PropertyToken is IERC20 {
     /**
      * @dev See `IERC20.allowance`.
      */
-    function allowance(address tokenOwner, address spender) public view returns (uint256) {
+    function allowance(address tokenOwner, address spender) public view override returns (uint256) {
         return _allowances[tokenOwner][spender];
     }
     
@@ -67,7 +69,7 @@ contract PropertyToken is IERC20 {
      *
      * - `spender` cannot be the zero address.
      */
-    function approve(address spender, uint256 value) public returns (bool) {
+    function approve(address spender, uint256 value) public override returns (bool) {
         _approve(msg.sender, spender, value);
         return true;
     }
@@ -84,7 +86,7 @@ contract PropertyToken is IERC20 {
      * - the caller must have allowance for `sender`'s tokens of at least
      * `amount`.
      */
-    function transferFrom(address sender, address recipient, uint256 amount) public returns (bool) {
+    function transferFrom(address sender, address recipient, uint256 amount) public override returns (bool) {
         _transfer(sender, recipient, amount);
         _approve(sender, msg.sender, _allowances[sender][msg.sender].sub(amount));
         return true;
@@ -189,7 +191,7 @@ contract PropertyToken is IERC20 {
     /**
      * @dev Doesn't accept ether
      */
-    function () external payable {
+    fallback () external payable {
         revert();
     }
     
@@ -208,9 +210,14 @@ contract PropertyTokenFactory {
         numberOfTokens++;
         
         emit NewToken(address(tokenContract));
+        
+        return address(tokenContract);
     }
     
     function totalTokens() public view returns(uint256) {
         return numberOfTokens;
+    }
+    function getTokenAddress(uint8 index) public view returns (address) {
+        return tokens[index];
     }
 }
