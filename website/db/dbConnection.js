@@ -1,14 +1,23 @@
 require('dotenv').config();
 
 const connect = async () => {
-    if (global.connection && global.connection.state !== 'disconnected') {
-        return global.connection;
+    try {
+        if (global.connection && global.connection.state !== 'disconnected') {
+            return global.connection;
+        }
+        const mysql = require('mysql2/promise');
+        const connection = await mysql.createConnection(process.env.MYSQL_DB_URL);
+        if (connection.errno) {
+            throw new Error('Error connecting to database');
+        }
+
+        console.log('Connected to MySQL database. Connection id:', connection.connection.connectionId);
+        global.connection = connection;
+        return connection;
+    } catch (error) {
+        console.log('Error connecting to database:', error);
+        return null;
     }
-    const mysql = require('mysql2/promise');
-    const connection = await mysql.createConnection(process.env.MYSQL_DB_URL);
-    console.log('Connected to MySQL database');
-    global.connection = connection;
-    return connection;
 }
 
 // connect();
@@ -25,59 +34,110 @@ const connect = async () => {
  * - image_filename varchar(500)
  */
 const selectProperties = async () => {
-    const conn = await connect();
-    const [rows] = await conn.query('SELECT * FROM Property;');
-    return rows;
+    try {
+        const conn = await connect();
+        if (conn !== null) {
+            const [rows] = await conn.query('SELECT * FROM Property;');
+            console.log('[dbConnection] properties:', rows);
+            return rows;
+        }
+    } catch (error) {
+        console.log('Error fetching properties:', error);
+        return [];
+    }
+}
+
+const deleteProperties = async () => {
+    try {
+        const conn = await connect();
+        if (conn !== null) {
+            const [rows] = await conn.query('DELETE FROM Property;');
+            return rows;
+        }
+    } catch (error) {
+        console.log('Error deleting properties:', error);
+        return [];
+    }
 }
 
 const selectPropertyById = async (id) => {
-    const conn = await connect();
-    const sql = 'SELECT * FROM Property WHERE id = ?';
-    const values = [id];
-    const [rows] = await conn.query(sql, values);
-    return rows;
+    try {
+        const conn = await connect();
+        if (conn !== null) {
+            const sql = 'SELECT * FROM Property WHERE id = ?';
+            const values = [id];
+            const [rows] = await conn.query(sql, values);
+            return rows;
+        }
+    } catch (error) {
+        console.log(`Error fetching property #${id}:`, error);
+        return [];
+    }
 }
 
 const insertProperty = async (property) => {
-    const conn = await connect();
-    const sql = `INSERT INTO Property (id, name, price, address, token_symbol, total_supply, eth_price, description, image_filename)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-    const values = [
-        property.id,
-        property.name,
-        property.price,
-        property.address,
-        property.token_symbol,
-        '3500', //property.total_supply,
-        '1', //property.eth_price,
-        property.description,
-        property.image_filename
-    ];
-
-    return await conn.query(sql, values);
+    try {
+        const conn = await connect();
+        if (conn !== null) {
+            const sql = `INSERT INTO Property (id, name, price, address, token_symbol, total_supply, eth_price, description, image_filename)
+                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+            const values = [
+                property.id,
+                property.name,
+                property.price,
+                property.address,
+                property.token_symbol,
+                property.total_supply,
+                property.eth_price,
+                property.description,
+                property.image_filename
+            ];
+        
+            const [rows] = await conn.query(sql, values);
+            console.log('[dbConnnection] insertProperty:', rows);
+            return rows;
+        }
+    } catch (error) {
+        console.log('Error inserting a property:', error);
+        return [];
+    }
 }
 
 const updateProperty = async () => {
-    const conn = await connect();
-    const sql = `UPDATE Property SET name=?, price=?, address=?, token_symbol=?, total_supply=?, eth_price=?, description=?, image_filename=?`;
-    const values = [
-        '1 bedroom apartment',
-        '5000000',
-        'Thackeray Street, Kensington, W8',
-        'KEN',
-        '3500',
-        '1',
-        'A tasteful-presented 1 bedroom 1st-floor apartment set within a convenient location very close to all the amenities of the Kensington High St & the famous Hyde Park. The property features 400 sq ft in size and is offered on a furnished basis.',
-        '1_bedroom_apartment.png'
-    ];
-    return await conn.query(sql, values);
+    try {
+        const conn = await connect();
+        if (conn !== null) {
+            const sql = `UPDATE Property SET name=?, price=?, address=?, token_symbol=?, total_supply=?, eth_price=?, description=?, image_filename=?`;
+            const values = [
+                '1 bedroom apartment',
+                '5000000',
+                'Thackeray Street, Kensington, W8',
+                'KEN',
+                '3500',
+                '1',
+                'A tasteful-presented 1 bedroom 1st-floor apartment set within a convenient location very close to all the amenities of the Kensington High St & the famous Hyde Park. The property features 400 sq ft in size and is offered on a furnished basis.',
+                '1_bedroom_apartment.png'
+            ];
+            return await conn.query(sql, values);
+        }
+    } catch (error) {
+        console.log('Error updating property:', error);
+        return [];
+    }
 }
 
 const deleteProperty = async () => {
-    const conn = await connect();
-    const sql = `DELETE FROM Property WHERE token_symbol=?`;
-    const values = 'KEN';
-    return await conn.query(sql, values);
+    try {
+        const conn = await connect();
+        if (conn !== null) {
+            const sql = `DELETE FROM Property WHERE token_symbol=?`;
+            const values = 'KEN';
+            return await conn.query(sql, values);
+        }
+    } catch (error) {
+        console.log('Error deleting property:', error);
+        return [];
+    }
 }
 
 /* TABLE User
@@ -87,29 +147,52 @@ const deleteProperty = async () => {
  * - password varchar(100)
  */
 const selectUsers = async () => {
-    const conn = await connect();
-    const [rows] = await conn.query('SELECT * FROM User;');
-    return rows;
+    try {
+        const conn = await connect();
+        if (conn !== null) {
+            const [rows] = await conn.query('SELECT * FROM User;');
+            console.log('[dbConnection] users:', rows);
+            return rows;
+        }
+    } catch (error) {
+        console.log('Error fetching users:', error);
+        return [];
+    }
 }
 
 const selectUser = async (username) => {
-    const conn = await connect();
-    const sql = 'SELECT * FROM User WHERE username = ?';
-    const values = [username];
-    const [user] = await conn.query(sql, values);
-    return user;
+    try {
+        const conn = await connect();
+        if (conn !== null) {
+            const sql = 'SELECT * FROM User WHERE username = ?';
+            const values = [username];
+            const [user] = await conn.query(sql, values);
+            return user;
+        }
+    } catch (error) {
+        console.log(`Error fetching user ${username}:`, error);
+        return [];
+    }
 }
 
 const insertUser = async ({id, fullname, username, password}) => {
-    const conn = await connect();
-    const sql = 'INSERT INTO User (id, fullname, username, password) VALUES (?, ?, ?, ?)';
-    const values = [id, fullname, username, password];
-    return await conn.query(sql, values);
+    try {
+        const conn = await connect();
+        if (conn !== null) {
+            const sql = 'INSERT INTO User (id, fullname, username, password) VALUES (?, ?, ?, ?)';
+            const values = [id, fullname, username, password];
+            return await conn.query(sql, values);
+        }
+    } catch (error) {
+        console.log(`Error inserting user ${username}:`, error);
+        return [];
+    }
 }
 
 module.exports = {
     connect,
     selectProperties,
+    deleteProperties,
     selectPropertyById,
     insertProperty,
     updateProperty,
