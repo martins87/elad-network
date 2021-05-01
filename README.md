@@ -6,8 +6,6 @@
 
  ```git clone https://github.com/martins87/elad-network.git```
  
- ```cd website```
- 
  ```npm install```
  
  ```npm start```
