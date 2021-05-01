@@ -4,15 +4,18 @@
     await window.ethereum.enable();
 })();
 
+var userAccount = '';
+var userBalance = 0;
+
 const provider = new ethers.providers.Web3Provider(window.ethereum);
 
 const loadAccountAndBalance = () => {
     provider.listAccounts().then(accounts => {
-        var userAccount = accounts[0];
+        userAccount = accounts[0];
         $('#accountAddress').text(userAccount);
     
         provider.getBalance(userAccount).then(balance => {
-            var userBalance = +ethers.utils.formatEther(balance);
+            userBalance = +ethers.utils.formatEther(balance);
             $('#accountBalance').text(userBalance.toFixed(4) + ' ETH');
         });
     
