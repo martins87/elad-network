@@ -214,8 +214,7 @@ app.get('/success', (req, res) => {
 });
 
 app.post('/login', async (req, res) => {
-    console.log('Session:');
-    console.log(req.session);
+    console.log('Session:', req.session);
 
     var data = req.body;
 
@@ -323,8 +322,9 @@ app.post('/signup', async (req, res) => {
                 });
             } else {
                 const response = await db.insertUser(newUser);
+                console.log('Response from dbConnection:', response);
     
-                if (response.length > 0) {
+                if (response.affectedRows === 1) {
                     console.log('User successfully created');
         
                     res.render('success', { title: 'Successful Login' });
@@ -593,33 +593,6 @@ app.get('/tokens', (req, res, next) => {
 });
 
 app.post('/create-property', async (req, res) => {
-    // var data = req.body;
-    // var imageFile = req.files.propertyImage;
-    // var newProperty = {
-    //     id: uniqid(),
-    //     name: data.propertyName,
-    //     price: data.propertyPrice,
-    //     address: data.propertyAddress,
-    //     token_symbol: data.tokenSymbol,
-    //     total_supply: data.totalSupply,
-    //     eth_price: Math.floor(+data.propertyPrice/+data.totalSupply),
-    //     description: data.propertyDescription,
-    //     image_filename: imageFile.name
-    // };
-
-    // console.log('New property:', newProperty);
-
-    // imageFile.mv('public/uploads/' + imageFile.name, (error) => {
-    //     if (error) {
-    //         console.log('Couldn\'t upload the image file')
-    //         console.log(error)
-    //     } else {
-    //         console.log('Image file successfully uploaded')
-    //     }
-    // });
-
-    // return;
-
     // Checks if user is logged in. If not, redirects to login page.
     if (typeof req.session.username === 'undefined') {
         console.log('NOT LOGGED IN');
@@ -646,10 +619,10 @@ app.post('/create-property', async (req, res) => {
             const response = await db.insertProperty(newProperty);
             console.log('Response from dbConnection:', response);
     
-            if (response.length > 0) {
+            if (response.affectedRows === 1) {
                 console.log('Property successfully listed');
 
-                imageFile.mv('public/uploads/' + imageFile.name, (error) => {
+                imageFile.mv('./src/public/uploads/' + imageFile.name, (error) => {
                     if (error) {
                         console.log('Couldn\'t upload the image file')
                         console.log(error)
@@ -658,7 +631,11 @@ app.post('/create-property', async (req, res) => {
                     }
                 });
     
-                res.redirect('properties');
+                res.render('create', {
+                    title: 'Create Property',
+                    user: req.session.username,
+                    msg: `Property ${newProperty.id} listed`
+                });
             } else {
                 res.render('create', {
                     title: 'Create property',
@@ -709,8 +686,8 @@ app.use((err, req, res, next) => {
     res.locals.error = req.app.get('env') === 'development' ? err : {};
 
     // render the error page
+    console.log('Error:', err);
     res.status(err.status || 500);
-    // res.render('error');
     res.render('error', { title: 'Request error', message: 'Some error ocurred.' });
 });
 

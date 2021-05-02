@@ -207,7 +207,9 @@ const insertUser = async ({id, fullname, username, password}) => {
         if (conn !== null) {
             const sql = 'INSERT INTO User (id, fullname, username, password) VALUES (?, ?, ?, ?)';
             const values = [id, fullname, username, password];
-            return await conn.query(sql, values);
+            const [rows] = await conn.query(sql, values);
+            console.log('[dbConnnection] insertUser:', rows);
+            return rows;
         }
     } catch (error) {
         console.log(`Error inserting user ${username}:`, error);
