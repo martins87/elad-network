@@ -25,15 +25,13 @@ const connectWithPool = async () => {
         if (global.connection && global.connection.state !== 'disconnected') {
             return global.connection;
         }
-        const mysql = require('mysql2/promise');
 
-        // const connection = await mysql.createConnection(process.env.MYSQL_DB_URL);
-        // mysql://elad:3l4dn3tw0rk_21@166.62.74.162:3306/elad-network
+        const mysql = require('mysql2/promise');
         const pool = mysql.createPool({
-            host: '166.62.74.162',
-            user: 'elad',
-            password: '3l4dn3tw0rk_21',
-            database: 'elad-network',
+            host: process.env.DB_HOST,
+            user: process.env.DB_USER,
+            password: process.env.DB_PASSWORD,
+            database: process.env.DB_DATABASE_NAME,
             waitForConnections: true,
             connectionLimit: 10,
             queueLimit: 0
