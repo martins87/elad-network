@@ -20,7 +20,8 @@ const db = require('./db/dbConnection');
 
 // MySQL database
 (async () => {
-    db.connect();
+    // db.connect();
+    db.connectWithPool();
 })();
 
 // MongoDB database
@@ -374,12 +375,6 @@ app.post('/signup', async (req, res) => {
 });
 
 app.get('/dashboard', (req, res, next) => {
-    res.render('dashboard', {
-        title: 'Dashboard',
-        user: req.session.username
-    });
-    return;
-
     // Checks if user is logged in. If not, redirects to login page.
     if (typeof req.session.username === 'undefined') {
         console.log('NOT LOGGED IN');
@@ -627,8 +622,8 @@ app.post('/create-property', async (req, res) => {
 
     // Checks if user is logged in. If not, redirects to login page.
     if (typeof req.session.username === 'undefined') {
-        console.log('NOT LOGGED IN')
-        res.render('login', { title: 'Login' })
+        console.log('NOT LOGGED IN');
+        res.render('login', { title: 'Login' });
     } else {
         var data = req.body;
         var imageFile = req.files.propertyImage;

@@ -20,6 +20,34 @@ const connect = async () => {
     }
 }
 
+const connectWithPool = async () => {
+    try {
+        if (global.connection && global.connection.state !== 'disconnected') {
+            return global.connection;
+        }
+        const mysql = require('mysql2/promise');
+
+        // const connection = await mysql.createConnection(process.env.MYSQL_DB_URL);
+        // mysql://elad:3l4dn3tw0rk_21@166.62.74.162:3306/elad-network
+        const pool = mysql.createPool({
+            host: '166.62.74.162',
+            user: 'elad',
+            password: '3l4dn3tw0rk_21',
+            database: 'elad-network',
+            waitForConnections: true,
+            connectionLimit: 10,
+            queueLimit: 0
+        });
+
+        console.log('Connected to MySQL database with a connection pool');
+        global.connection = pool;
+        return pool;
+    } catch (error) {
+        console.log('Error connecting to database:', error);
+        return null;
+    }
+}
+
 // connect();
 
 /* TABLE Property
@@ -191,6 +219,7 @@ const insertUser = async ({id, fullname, username, password}) => {
 
 module.exports = {
     connect,
+    connectWithPool,
     selectProperties,
     deleteProperties,
     selectPropertyById,
