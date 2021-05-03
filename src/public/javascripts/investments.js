@@ -11,7 +11,7 @@
 
 // Factory Contract
 const factoryContract = {
-	address: "0xe8F28BaFb98C37a09374EDcB67f020Ccdb8FCC9E", // Ropsten
+	address: "0x305CE48192E18b4EBa6F8547aFaA17ab74cdF20D", // Ropsten
 	ABI: [
 		'function createProperty(string memory _symbol, string memory _name, uint256 _supplyOfTokens, address payable _owner) public returns (address)',
 		'function totalTokens() public view returns(uint256)',
@@ -46,10 +46,13 @@ const loadPropertyTokens = async () => {
 				'function buyTokens() public payable',
 				'function myBalance() public view returns (uint balance)',
 				'function tokensLeft() public view returns(uint256)',
-				'function propertyDetails() public view returns(string memory, string memory, uint256, uint256, uint256)'
+				'function propertyDetails() public view returns(string memory, string memory, uint256, uint256, uint256, address)',
+				'function getOwner() public view returns (address)'
 			]
 		}
 		const propertyTokenInstance = new ethers.Contract(propertyTokenContract.address, propertyTokenContract.ABI, provider);
+
+		console.log(`${address} instance:`, propertyTokenInstance);
 
 		const balance = await propertyTokenInstance.myBalance();
 		console.log(`${userAccount}'s balance: ${balance}`)
@@ -90,6 +93,10 @@ function formatNumber(number) {
 
 loadAccountAndBalance();
 loadPropertyTokens();
+
+if (false) {
+	document.getElementById('investments').innerHTML = '<div class="text-center py-5"><h1>No property tokens bought yet</h1></div>';
+}
 
 /**
  * Detects if account was changed on MetaMask and updates users's portfolio

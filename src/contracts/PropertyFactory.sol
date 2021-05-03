@@ -184,8 +184,8 @@ contract PropertyToken is IERC20 {
     /**
      * @dev Returns some property details
      */
-    function propertyDetails() public view returns(string memory, string memory, uint256, uint256, uint256) {
-        return (name, symbol, _totalSupply, tokensBought, tokensLeft());
+    function propertyDetails() public view returns(string memory, string memory, uint256, uint256, uint256, address) {
+        return (name, symbol, _totalSupply, tokensBought, tokensLeft(), owner);
     }
     
     /**

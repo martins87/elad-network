@@ -11,7 +11,7 @@
 
 // Factory Contract
 const factoryContract = {
-	address: "0xe8F28BaFb98C37a09374EDcB67f020Ccdb8FCC9E", // Ropsten
+	address: "0x305CE48192E18b4EBa6F8547aFaA17ab74cdF20D", // Ropsten
 	ABI: [
 		'function createProperty(string memory _symbol, string memory _name, uint256 _supplyOfTokens, address payable _owner) public returns (address)',
 		'function totalTokens() public view returns(uint256)',
@@ -51,6 +51,7 @@ const createToken = async () => {
 	if(isDataValid) {
 		try {
 			createProperty(tokenSymbol, propertyName, tokenTotalSupply, owner);
+			return;
 		} catch (error) {
 			console.log('Error calling contract function createProperty:', error);
 			return;
@@ -110,7 +111,6 @@ const createProperty = async (symbol, tokenName, supply, owner) => {
 		const txReceipt = await txResponse.wait();
 		console.log('txReceipt:', txReceipt);
 		alert(`Property token created. Please check last transaction of contract ${txReceipt.to}`);
-		// return txReceipt;
 	} catch (error) {
 		console.log('Error writing to contract:', error);
 		return null;

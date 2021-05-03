@@ -11,7 +11,7 @@
 
 // Factory Contract
 const factoryContract = {
-	address: "0xe8F28BaFb98C37a09374EDcB67f020Ccdb8FCC9E", // Ropsten
+	address: "0x305CE48192E18b4EBa6F8547aFaA17ab74cdF20D", // Ropsten
 	ABI: [
 		'function createProperty(string memory _symbol, string memory _name, uint256 _supplyOfTokens, address payable _owner) public returns (address)',
 		'function totalTokens() public view returns(uint256)',
@@ -59,7 +59,8 @@ const loadPropertyTokens = async () => {
 				'function buyTokens() public payable',
 				'function myBalance() public view returns (uint balance)',
 				'function tokensLeft() public view returns(uint256)',
-				'function propertyDetails() public view returns(string memory, string memory, uint256, uint256, uint256)'
+				'function propertyDetails() public view returns(string memory, string memory, uint256, uint256, uint256, address)',
+				'function getOwner() public view returns (address)'
 			]
 		}
 		const propertyTokenInstance = new ethers.Contract(propertyTokenContract.address, propertyTokenContract.ABI, provider);
@@ -67,7 +68,7 @@ const loadPropertyTokens = async () => {
 		// finally we get data from each token
 		const tokenDetails = await propertyTokenInstance.propertyDetails();
 		console.log('Token details: ', tokenDetails);
-		[tokenName, tokenSymbol, totalSupply, tokensBought, tokensLeft] = tokenDetails;
+		[tokenName, tokenSymbol, totalSupply, tokensBought, tokensLeft, propertyOwner] = tokenDetails;
 
 		// populate table with token details
 		var table = document.getElementById("tokensTable");
@@ -77,12 +78,14 @@ const loadPropertyTokens = async () => {
 		var cell2 = row.insertCell(2);
 		var cell3 = row.insertCell(3);
 		var cell4 = row.insertCell(4);
+		var cell5 = row.insertCell(5);
 
 		cell0.innerHTML = tokenName + ' (' + tokenSymbol + ')';
 		cell1.innerHTML = totalSupply;
 		cell2.innerHTML = tokensBought;
 		cell3.innerHTML = tokensLeft;
 		cell4.innerHTML = "<a href=\"https://ropsten.etherscan.io/token/" + address + "\" target=\"_blank\">" + address + "</a>&nbsp;&nbsp;<i class=\"fas fa-external-link-alt\"></i>";
+		cell5.innerHTML = "<a href=\"https://ropsten.etherscan.io/address/" + propertyOwner + "\" target=\"_blank\">" + propertyOwner + "</a>&nbsp;&nbsp;<i class=\"fas fa-external-link-alt\"></i>";
 	}
 }
 
