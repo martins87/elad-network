@@ -189,6 +189,13 @@ contract PropertyToken is IERC20 {
     }
     
     /**
+     * @dev Returns contract owner address
+     */
+    function getOwner() public view returns (address) {
+        return owner;
+    }
+    
+    /**
      * @dev Doesn't accept ether
      */
     fallback () external payable {
