@@ -84,13 +84,17 @@ const loadPropertyTokens = async () => {
 		cell1.innerHTML = totalSupply;
 		cell2.innerHTML = tokensBought;
 		cell3.innerHTML = tokensLeft;
-		cell4.innerHTML = "<a href=\"https://ropsten.etherscan.io/token/" + address + "\" target=\"_blank\">" + address + "</a>&nbsp;&nbsp;<i class=\"fas fa-external-link-alt\"></i>";
-		cell5.innerHTML = "<a href=\"https://ropsten.etherscan.io/address/" + propertyOwner + "\" target=\"_blank\">" + propertyOwner + "</a>&nbsp;&nbsp;<i class=\"fas fa-external-link-alt\"></i>";
+		cell4.innerHTML = "<a href=\"https://ropsten.etherscan.io/token/" + address + "\" target=\"_blank\">" + formatAddress(address) + "</a>&nbsp;&nbsp;<i class=\"fas fa-external-link-alt\"></i>";
+		cell5.innerHTML = "<a href=\"https://ropsten.etherscan.io/address/" + propertyOwner + "\" target=\"_blank\">" + formatAddress(propertyOwner) + "</a>&nbsp;&nbsp;<i class=\"fas fa-external-link-alt\"></i>";
 	}
 }
 
-function formatNumber(number) {
+const formatNumber = (number) => {
     return number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
+}
+
+const formatAddress = (address) => {
+	return address.substring(0, address.length/2.5) + '...';
 }
 
 loadPropertyTokens();
