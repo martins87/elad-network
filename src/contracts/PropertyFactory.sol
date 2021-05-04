@@ -170,7 +170,7 @@ contract PropertyToken is IERC20 {
     /**
      * @dev Returns token balance of calling account
      */
-    function myBalance() public view returns (uint balance) {
+    function myBalance() public view returns (uint256) {
         return _balances[msg.sender];
     }
     

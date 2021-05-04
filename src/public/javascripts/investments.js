@@ -11,7 +11,7 @@
 
 // Factory Contract
 const factoryContract = {
-	address: "0x305CE48192E18b4EBa6F8547aFaA17ab74cdF20D", // Ropsten
+	address: "0xD853DE197Dde468613e425cB3689269994B78426", // Ropsten
 	ABI: [
 		'function createProperty(string memory _symbol, string memory _name, uint256 _supplyOfTokens, address payable _owner) public returns (address)',
 		'function totalTokens() public view returns(uint256)',
@@ -44,7 +44,7 @@ const loadPropertyTokens = async () => {
 				'function _transfer(address sender, address recipient, uint256 amount) internal',
 				'function _approve(address tokenOwner, address spender, uint256 value) internal',
 				'function buyTokens() public payable',
-				'function myBalance() public view returns (uint balance)',
+				'function myBalance() public view returns (uint256)',
 				'function tokensLeft() public view returns(uint256)',
 				'function propertyDetails() public view returns(string memory, string memory, uint256, uint256, uint256, address)',
 				'function getOwner() public view returns (address)'
@@ -52,37 +52,26 @@ const loadPropertyTokens = async () => {
 		}
 		const propertyTokenInstance = new ethers.Contract(propertyTokenContract.address, propertyTokenContract.ABI, provider);
 
-		console.log(`${address} instance:`, propertyTokenInstance);
-
-		const balance = await propertyTokenInstance.myBalance();
-		console.log(`${userAccount}'s balance: ${balance}`)
-		if(balance > 0) {
+		const userBalance = await propertyTokenInstance.balanceOf(userAccount);
+		if(userBalance > 0) {
 			// finally we get data from each token
-			// property.propertyDetails(function(error, details) {
-			// 	// populate table with token details
-			// 	var table = document.getElementById("investmentsTable")
+			const tokenDetails = await propertyTokenInstance.propertyDetails();
+			[tokenName, tokenSymbol, totalSupply, tokensBought, tokensLeft, propertyOwner] = tokenDetails;
 
-			// 	var row = table.insertRow(1)
-			// 	var cell0 = row.insertCell(0)
-			// 	var cell1 = row.insertCell(1)
-			// 	var cell2 = row.insertCell(2)
-			// 	var cell3 = row.insertCell(3)
-			// 	var cell4 = row.insertCell(4)
+			// populate table with token details
+			var table = document.getElementById("investmentsTable");
+			var row = table.insertRow(1);
+			var cell0 = row.insertCell(0);
+			var cell1 = row.insertCell(1);
+			var cell2 = row.insertCell(2);
+			var cell3 = row.insertCell(3);
+			var cell4 = row.insertCell(4);
 
-			// 	var parsedData = details
-			// 	var name = parsedData[0]
-			// 	var symbol = parsedData[1]
-			// 	var totalSupply = formatNumber(parsedData[2].c[0])
-			// 	var tokensBought = formatNumber(balance)
-			// 	var tokensLeft = formatNumber(parsedData[4].c[0])
-				
-			// 	cell0.innerHTML = name + ' (' + symbol + ')'
-			// 	cell1.innerHTML = totalSupply
-			// 	cell2.innerHTML = tokensBought
-			// 	cell3.innerHTML = tokensLeft
-			// 	// cell4.innerHTML = "<a href=\"https://kovan.etherscan.io/token/" + address + "\" target=\"_blank\">" + address + "</a>"
-			// 	cell4.innerHTML = "<a href=\"https://ropsten.etherscan.io/token/" + address + "\" target=\"_blank\">" + address + "</a>&nbsp;&nbsp;<i class=\"fas fa-external-link-alt\"></i>"
-			// })
+			cell0.innerHTML = tokenName + ' (' + tokenSymbol + ')';
+			cell1.innerHTML = totalSupply;
+			cell2.innerHTML = userBalance;
+			cell3.innerHTML = tokensLeft;
+			cell4.innerHTML = "<a href=\"https://ropsten.etherscan.io/token/" + address + "\" target=\"_blank\">" + address + "</a>&nbsp;&nbsp;<i class=\"fas fa-external-link-alt\"></i>"
 		}
 	}
 }
@@ -98,14 +87,12 @@ if (false) {
 	document.getElementById('investments').innerHTML = '<div class="text-center py-5"><h1>No property tokens bought yet</h1></div>';
 }
 
-/**
- * Detects if account was changed on MetaMask and updates users's portfolio
- */
+/* Detects if account was changed on MetaMask and updates users's portfolio */
  window.ethereum.on('accountsChanged', async () => {
 	var node = document.getElementById("tableBody");
 	while(node.hasChildNodes()) {
 		node.removeChild(node.lastChild);
 	}
-	
+
 	await loadPropertyTokens();
 });

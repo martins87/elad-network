@@ -2,7 +2,7 @@
 
 // Factory Contract
 const factoryContract = {
-	address: "0xe8F28BaFb98C37a09374EDcB67f020Ccdb8FCC9E", // Ropsten
+	address: "0xD853DE197Dde468613e425cB3689269994B78426", // Ropsten
 	ABI: [
 		'function createProperty(string memory _symbol, string memory _name, uint256 _supplyOfTokens, address payable _owner) public returns (address)',
 		'function totalTokens() public view returns(uint256)',

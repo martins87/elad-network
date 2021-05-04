@@ -11,7 +11,7 @@
 
 // Factory Contract
 const factoryContract = {
-	address: "0x305CE48192E18b4EBa6F8547aFaA17ab74cdF20D", // Ropsten
+	address: "0xD853DE197Dde468613e425cB3689269994B78426", // Ropsten
 	ABI: [
 		'function createProperty(string memory _symbol, string memory _name, uint256 _supplyOfTokens, address payable _owner) public returns (address)',
 		'function totalTokens() public view returns(uint256)',
@@ -57,7 +57,7 @@ const loadPropertyTokens = async () => {
 				'function _transfer(address sender, address recipient, uint256 amount) internal',
 				'function _approve(address tokenOwner, address spender, uint256 value) internal',
 				'function buyTokens() public payable',
-				'function myBalance() public view returns (uint balance)',
+				'function myBalance() public view returns (uint256)',
 				'function tokensLeft() public view returns(uint256)',
 				'function propertyDetails() public view returns(string memory, string memory, uint256, uint256, uint256, address)',
 				'function getOwner() public view returns (address)'
