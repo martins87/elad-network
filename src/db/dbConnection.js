@@ -61,7 +61,7 @@ const connectWithPool = async () => {
  */
 const selectProperties = async () => {
     try {
-        const conn = await connect();
+        const conn = await connectWithPool();
         if (conn !== null) {
             const [rows] = await conn.query('SELECT * FROM Property;');
             console.log('[dbConnection] properties:', rows);
@@ -75,7 +75,7 @@ const selectProperties = async () => {
 
 const deleteProperties = async () => {
     try {
-        const conn = await connect();
+        const conn = await connectWithPool();
         if (conn !== null) {
             const [rows] = await conn.query('DELETE FROM Property;');
             return rows;
@@ -88,7 +88,7 @@ const deleteProperties = async () => {
 
 const selectPropertyById = async (id) => {
     try {
-        const conn = await connect();
+        const conn = await connectWithPool();
         if (conn !== null) {
             const sql = 'SELECT * FROM Property WHERE id = ?';
             const values = [id];
@@ -103,7 +103,7 @@ const selectPropertyById = async (id) => {
 
 const insertProperty = async (property) => {
     try {
-        const conn = await connect();
+        const conn = await connectWithPool();
         if (conn !== null) {
             const sql = `INSERT INTO Property (id, name, price, address, token_symbol, total_supply, eth_price, description, image_filename)
                          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
@@ -154,7 +154,7 @@ const updateProperty = async () => {
 
 const deleteProperty = async () => {
     try {
-        const conn = await connect();
+        const conn = await connectWithPool();
         if (conn !== null) {
             const sql = `DELETE FROM Property WHERE token_symbol=?`;
             const values = 'KEN';
@@ -174,7 +174,7 @@ const deleteProperty = async () => {
  */
 const selectUsers = async () => {
     try {
-        const conn = await connect();
+        const conn = await connectWithPool();
         if (conn !== null) {
             const [rows] = await conn.query('SELECT * FROM User;');
             console.log('[dbConnection] users:', rows);
@@ -188,7 +188,7 @@ const selectUsers = async () => {
 
 const selectUser = async (username) => {
     try {
-        const conn = await connect();
+        const conn = await connectWithPool();
         if (conn !== null) {
             const sql = 'SELECT * FROM User WHERE username = ?';
             const values = [username];
@@ -203,7 +203,7 @@ const selectUser = async (username) => {
 
 const insertUser = async ({id, fullname, username, password}) => {
     try {
-        const conn = await connect();
+        const conn = await connectWithPool();
         if (conn !== null) {
             const sql = 'INSERT INTO User (id, fullname, username, password) VALUES (?, ?, ?, ?)';
             const values = [id, fullname, username, password];
