@@ -4,8 +4,9 @@
     await window.ethereum.enable();
 })();
 
-var account = document.getElementById('accountAddress').innerHTML;
-console.log('[createProperty.js] account:', account);
+var userAccount = '';
+var userBalance = 0;
+var provider = new ethers.providers.Web3Provider(window.ethereum);
 
 // Factory Contract
 const factoryContract = {
@@ -18,70 +19,84 @@ const factoryContract = {
 }
 const factoryInstance = new ethers.Contract(factoryContract.address, factoryContract.ABI, provider);
 
-// Property Token
-var propertyTokenABI = ['']
-
-var propertyTokenAddress
-
-function loadPropertyData(address) {
-	var propertyName = document.getElementById('nome').innerHTML
-
-	// first we get number of tokens created
-    factory.totalTokens(function(error, number) {
-
-        // now we get tokens addresses
-        for(var i = 0; i < number; i++) {
-            factory.tokens(i, function(error, tokenAddress) {
-
-				// instance of target token
-				var targetToken = propertyTokenABI.at(tokenAddress)
-
-				targetToken.name(function(error, name) {
-					if(propertyName == name) {
-
-						// do stuff here...
-
-						targetToken.totalSupply(function(error, result) {
-							let totalSupply = formatNumber(result)
-							$('#totalSupply_1').text(totalSupply)
-							$('#totalSupply_2').text(totalSupply)
-						})
-					
-						targetToken.tokensLeft(function(error, result) {
-							let tokensLeft = formatNumber(result)
-							$('#tokensLeft_1').text(tokensLeft)
-							$('#tokensLeft_2').text(tokensLeft)
-						})
-					
-						targetToken.myBalance(function(error, result) {
-							let myBalance = formatNumber(result)
-							$('#myBalance_1').text(myBalance)
-							$('#myBalance_2').text(myBalance)
-						})
-					}
-				})
-            })
-        }
-	})
-	
-    // get account balance in Ether
-    web3.eth.getBalance(address, function(error, res) {
-        if(error) {
-            console.log(error)
-        } else {
-            let accountBalance = web3.fromWei(res, 'ether').toFixed(4) + ' ETH'
-            $('#ethBalance').text(accountBalance)
-        }
-	})
+const loadAccount = async () => {
+    provider.listAccounts().then(accounts => {
+		console.log('accounts:', accounts);
+        userAccount = accounts[0];
+		
+        provider.getBalance(userAccount).then(balance => {
+			userBalance = +ethers.utils.formatEther(balance);
+        });
+    
+        return;
+    });
 }
 
-loadPropertyData(accountAddress)
+const loadPropertyData = async () => {
+	var propertyName = document.getElementById('nome').innerHTML;
+
+	// first we get number of tokens created
+    const totalTokens = await factoryInstance.totalTokens();
+
+	// now we get tokens addresses
+	for(let i = 0; i < totalTokens; i++) {
+		let address = await factoryInstance.getTokenAddress(i);
+		console.log(`Token ${i} address:`, address);
+
+		// Property Token Contract
+		var propertyTokenContract = {
+			address: address,
+			ABI: [
+				'constructor(string memory _symbol, string memory _name, uint256 _initialSupply, address payable _owner) public',
+				'function totalSupply() public view override returns (uint256)',
+				'function balanceOf(address account) public view override returns (uint256)',
+				'function transfer(address recipient, uint256 amount) public override returns (bool)',
+				'function allowance(address tokenOwner, address spender) public view override returns (uint256)',
+				'function approve(address spender, uint256 value) public override returns (bool)',
+				'function transferFrom(address sender, address recipient, uint256 amount) public override returns (bool)',
+				'function _transfer(address sender, address recipient, uint256 amount) internal',
+				'function _approve(address tokenOwner, address spender, uint256 value) internal',
+				'function buyTokens() public payable',
+				'function myBalance() public view returns (uint256)',
+				'function tokensLeft() public view returns(uint256)',
+				'function propertyDetails() public view returns(string memory, string memory, uint256, uint256, uint256, address)',
+				'function getOwner() public view returns (address)'
+			]
+		}
+		var propertyTokenInstance = new ethers.Contract(propertyTokenContract.address, propertyTokenContract.ABI, provider);
+
+		// finally we get data from each token
+		const tokenDetails = await propertyTokenInstance.propertyDetails();
+		[tokenName, tokenSymbol, totalSupply, tokensBought, tokensLeft, propertyOwner] = tokenDetails;
+		console.log('token name:', tokenName);
+
+		if(propertyName == tokenName) {
+			console.log('BINGO!');
+
+			$('#totalSupply_1').text(totalSupply);
+			$('#totalSupply_2').text(totalSupply);
+		
+			$('#tokensLeft_1').text(tokensLeft);
+			$('#tokensLeft_2').text(tokensLeft);
+
+			const userTokenBalance = await propertyTokenInstance.balanceOf(userAccount);
+			$('#myBalance_1').text(userTokenBalance);
+			$('#myBalance_2').text(userTokenBalance);
+
+			break;
+		}
+	}
+}
+
+loadAccount();
+loadPropertyData();
 
 /**
  * Detects if account was changed on MetaMask and updates property's info
  */
-window.ethereum.on('accountsChanged', function(accounts) {
-    loadPropertyData(accounts[0])
+window.ethereum.on('accountsChanged', async () => {
+	loadAccount();
+	loadPropertyData();
 })
 
 function buyTokens() {

@@ -6,14 +6,13 @@
 
 var userAccount = '';
 var userBalance = 0;
-
-const provider = new ethers.providers.Web3Provider(window.ethereum);
+var provider = new ethers.providers.Web3Provider(window.ethereum);
 
 const loadAccountAndBalance = () => {
     provider.listAccounts().then(accounts => {
         userAccount = accounts[0];
         $('#accountAddress').text(userAccount);
-    
+        
         provider.getBalance(userAccount).then(balance => {
             userBalance = +ethers.utils.formatEther(balance);
             $('#accountBalance').text(userBalance.toFixed(4) + ' ETH');
