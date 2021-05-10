@@ -14,6 +14,8 @@ const fileUpload = require('express-fileupload');
 const uniqid = require('uniqid');
 const db = require('./db/dbConnection');
 
+const useLogin = true;
+
 // Property MongoDB model
 // const Property = require('./db/models/property')
 // const User = require('./db/models/user')
@@ -376,7 +378,7 @@ app.post('/signup', async (req, res) => {
 
 app.get('/dashboard', (req, res, next) => {
     // Checks if user is logged in. If not, redirects to login page.
-    if (typeof req.session.username === 'undefined') {
+    if (typeof req.session.username === 'undefined' && useLogin) {
         console.log('NOT LOGGED IN');
         res.render('login', { title: 'Login' });
     } else {
@@ -389,15 +391,8 @@ app.get('/dashboard', (req, res, next) => {
 });
 
 app.get('/properties', async (req, res) => {
-    // res.render('properties', {
-    //     propertiesList: [],
-    //     title: 'Properties',
-    //     user: 'mock'
-    // });
-    // return;
-
     // Checks if user is logged in. If not, redirects to login page.
-    if (typeof req.session.username === 'undefined') {
+    if (typeof req.session.username === 'undefined' && useLogin) {
         console.log('NOT LOGGED IN')
         res.render('login', { title: 'Login' })
     } else {
@@ -444,7 +439,7 @@ app.get('/properties', async (req, res) => {
 
 app.get('/properties/:id', async (req, res) => {
     // Checks if user is logged in. If not, redirects to login page.
-    if (typeof req.session.username === 'undefined') {
+    if (typeof req.session.username === 'undefined' && useLogin) {
         console.log('NOT LOGGED IN');
         res.render('login', { title: 'Login' });
     } else {
@@ -503,7 +498,7 @@ app.get('/create', (req, res, next) => {
     // return;
 
     // Checks if user is logged in
-    if (typeof req.session.username === 'undefined') {
+    if (typeof req.session.username === 'undefined' && useLogin) {
         console.log('NOT LOGGED IN')
         res.render('login', { title: 'Login' })
     } else {
@@ -520,7 +515,7 @@ app.get('/create', (req, res, next) => {
 
 app.get('/users', async (req, res) => {
     // Checks if user is logged in
-    if (typeof req.session.username === 'undefined') {
+    if (typeof req.session.username === 'undefined' && useLogin) {
         console.log('NOT LOGGED IN')
         res.render('login', { title: 'Login' })
     } else {
@@ -583,7 +578,7 @@ app.get('/tokens', (req, res, next) => {
     return;
 
     // Checks if user is logged in
-    if (typeof req.session.username === 'undefined') {
+    if (typeof req.session.username === 'undefined' && useLogin) {
         console.log('NOT LOGGED IN');
         res.render('login', { title: 'Login' });
     } else {

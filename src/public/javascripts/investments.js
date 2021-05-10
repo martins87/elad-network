@@ -28,7 +28,6 @@ const loadPropertyTokens = async () => {
 	// now we get tokens addresses
 	for(let i = 0; i < totalTokens; i++) {
 		let address = await factoryInstance.getTokenAddress(i);
-		console.log(`Token ${i} address:`, address);
 
 		// Property Token Contract
 		const propertyTokenContract = {
@@ -54,6 +53,8 @@ const loadPropertyTokens = async () => {
 
 		const userBalance = await propertyTokenInstance.balanceOf(userAccount);
 		if(userBalance > 0) {
+			console.log(`Token ${i} address:`, address);
+			
 			// finally we get data from each token
 			const tokenDetails = await propertyTokenInstance.propertyDetails();
 			[tokenName, tokenSymbol, totalSupply, tokensBought, tokensLeft, propertyOwner] = tokenDetails;
