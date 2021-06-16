@@ -7,25 +7,38 @@ import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contr
 
 contract PropertyToken is IERC20 {
     using SafeMath for uint256;
+    
+    struct Price {
+        uint256 amount;
+        uint256 price;
+    }
 
     string public symbol;
     string public name;
     uint8 public decimals;
     uint256 private _totalSupply;
-    uint256 public tokensBought;
-    address payable public owner;
+    uint256 private _tokensBought;
+    uint256 private _exchangeRate;
+    address payable private _owner;
 
     mapping(address => uint256) private _balances;
     mapping (address => mapping (address => uint256)) private _allowances;
+    mapping (address => Price[]) private _auction;
+    mapping (address => uint256) private _tokensOnAuction;
 
-    constructor(string memory _symbol, string memory _name, uint256 _initialSupply, address payable _owner) public {
+    constructor(string memory _symbol, string memory _name, uint256 _initialSupply, address payable owner) public {
         symbol = _symbol;
         name = _name;
         decimals = 0;
         _totalSupply = _initialSupply * 10**uint(decimals);
-        owner = _owner;
+        _exchangeRate = 100;
+        _owner = owner;
         _balances[_owner] = _totalSupply;
         emit Transfer(address(0), _owner, _totalSupply);
+    }
+    
+    function getTokensBought() public view returns(uint256) {
+        return _tokensBought;
     }
     
     /**
@@ -151,20 +164,41 @@ contract PropertyToken is IERC20 {
      * - amount of tokens to buy must be less or equal contract owner's balance.
      */
     function buyTokens() public payable {
-        require(msg.sender != owner, "Caller can't be contract owner");
+        require(msg.sender != _owner, "Caller can't be contract owner");
         
-        uint256 exchangeRate = 1000;
-        uint256 tokens = exchangeRate.mul(msg.value).div(1 ether);
+        uint256 amount = _exchangeRate.mul(msg.value).div(1 ether);
         
-        require(tokens > 0, "Amount of ether sent less than 1 Finney");
-        require(tokens <= _balances[owner], "Contract owner doesn't have enough balance");
+        require(amount > 0, "Amount of ether sent less than 1 Finney");
+        require(amount <= _balances[_owner], "Contract owner doesn't have enough balance");
         
-        _transfer(owner, msg.sender, tokens);
-        owner.transfer(msg.value);
+        _transfer(_owner, msg.sender, amount);
+        _owner.transfer(msg.value);
         
-        tokensBought += tokens;
+        _tokensBought += amount;
+        _auction[_owner][0].amount -= amount;
+        _tokensOnAuction[_owner] -= amount;
         
-        emit Transfer(owner, msg.sender, tokens);
+        emit Transfer(_owner, msg.sender, amount);
+    }
+    
+    function buyFromAuction(address tokenOwner, uint index, uint256 amount) public payable {
+        require(msg.sender != _owner, "Caller can't be contract owner");
+        
+        // uint256 tokenPrice = _auction[tokenOwner][index].price;
+        //uint256 tokens = msg.value.div(amount);
+        // TODO verify values are correct
+        // uint256 isItRight = msg.value.div(tokenPrice);
+        
+        // require(tokens > 0, "Amount of ether sent less than 1 Finney");
+        // require(tokens <= _balances[owner], "Contract owner doesn't have enough balance");
+        
+        _transfer(tokenOwner, msg.sender, amount);
+        payable(tokenOwner).transfer(msg.value);
+        
+        _auction[tokenOwner][index].amount -= amount;
+        _tokensOnAuction[tokenOwner] -= amount;
+        
+        emit Transfer(tokenOwner, msg.sender, amount);
     }
     
     /**
@@ -178,21 +212,21 @@ contract PropertyToken is IERC20 {
      * @dev Returns available amount of tokens to buy
      */
     function tokensLeft() public view returns(uint256) {
-        return totalSupply() - tokensBought;
+        return totalSupply() - _tokensBought;
     }
     
     /**
      * @dev Returns some property details
      */
     function propertyDetails() public view returns(string memory, string memory, uint256, uint256, uint256, address) {
-        return (name, symbol, _totalSupply, tokensBought, tokensLeft(), owner);
+        return (name, symbol, _totalSupply, _tokensBought, tokensLeft(), _owner);
     }
     
     /**
      * @dev Returns contract owner address
      */
     function getOwner() public view returns (address) {
-        return owner;
+        return _owner;
     }
     
     /**
@@ -209,7 +243,7 @@ contract PropertyTokenFactory {
     
     address[] public tokens;
     uint256 private numberOfTokens;
-
+    
     function createProperty(string memory _symbol, string memory _name, uint256 _supplyOfTokens, address payable _owner) public returns (address) {
         PropertyToken tokenContract = new PropertyToken(_symbol, _name, _supplyOfTokens, _owner);
         
