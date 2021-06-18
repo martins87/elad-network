@@ -34,6 +34,7 @@ contract PropertyToken is IERC20 {
         _exchangeRate = 100;
         _owner = owner;
         _balances[_owner] = _totalSupply;
+        addAuction(_owner, _totalSupply, 10000000000000000);
         emit Transfer(address(0), _owner, _totalSupply);
     }
     
@@ -147,6 +148,33 @@ contract PropertyToken is IERC20 {
 
         _allowances[tokenOwner][spender] = value;
         emit Approval(tokenOwner, spender, value);
+    }
+    
+
+    function addAuction(uint256 amount, uint256 price) public {
+        _auction[msg.sender].push(Price(amount, price));
+        _tokensOnAuction[msg.sender] += amount;
+    }
+    
+    function addAuction(address addr, uint256 amount, uint256 price) private {
+        _auction[addr].push(Price(amount, price));
+        _tokensOnAuction[addr] += amount;
+    }
+    
+    function getTotalOwnerAuctions(address addr) public view returns(uint256){
+        return _auction[addr].length;
+    }
+    
+    function getOwnerAuctions(address addr) public view returns(Price[] memory){
+        return _auction[addr];
+    }
+
+    function getAuction(address addr, uint index) public view returns(Price memory){
+        return _auction[addr][index];
+    }
+    
+    function getOwnerTokensOnAuction(address addr) public view returns(uint256) {
+        return _tokensOnAuction[addr];
     }
     
     /**
