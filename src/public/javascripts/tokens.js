@@ -11,7 +11,7 @@
 
 // Factory Contract
 const factoryContract = {
-	address: "0xD853DE197Dde468613e425cB3689269994B78426", // Ropsten
+	address: "0x1d24d62bf046bcb28fa6d0a2ed82b48529034d19", // Ropsten
 	ABI: [
 		'function createProperty(string memory _symbol, string memory _name, uint256 _supplyOfTokens, address payable _owner) public returns (address)',
 		'function totalTokens() public view returns(uint256)',
@@ -47,7 +47,8 @@ const loadPropertyTokens = async () => {
 		const propertyTokenContract = {
 			address: address,
 			ABI: [
-				'constructor(string memory _symbol, string memory _name, uint256 _initialSupply, address payable _owner) public',
+				'constructor(string memory _symbol, string memory _name, uint256 _initialSupply, address payable owner) public',
+				'function getTokensBought() public view returns(uint256)',
 				'function totalSupply() public view override returns (uint256)',
 				'function balanceOf(address account) public view override returns (uint256)',
 				'function transfer(address recipient, uint256 amount) public override returns (bool)',
@@ -56,7 +57,13 @@ const loadPropertyTokens = async () => {
 				'function transferFrom(address sender, address recipient, uint256 amount) public override returns (bool)',
 				'function _transfer(address sender, address recipient, uint256 amount) internal',
 				'function _approve(address tokenOwner, address spender, uint256 value) internal',
+				'function addAuction(uint256 amount, uint256 price) public',
+				'function addAuction(address addr, uint256 amount, uint256 price) private',
+				'function getTotalOwnerAuctions(address addr) public view returns(uint256)',
+				'function getAuction(address addr, uint index) public view returns(Price)',
+				'function getOwnerTokensOnAuction(address addr) public view returns(uint256)',
 				'function buyTokens() public payable',
+				'function buyFromAuction(address tokenOwner, uint index, uint256 amount) public payable',
 				'function myBalance() public view returns (uint256)',
 				'function tokensLeft() public view returns(uint256)',
 				'function propertyDetails() public view returns(string memory, string memory, uint256, uint256, uint256, address)',

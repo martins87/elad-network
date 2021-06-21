@@ -11,7 +11,8 @@ var provider = new ethers.providers.Web3Provider(window.ethereum);
 const loadAccountAndBalance = () => {
     provider.listAccounts().then(accounts => {
         userAccount = accounts[0];
-        $('#accountAddress').text(userAccount);
+        let addr = userAccount.substring(0, 6) + '...' + userAccount.substring(userAccount.length-4, userAccount.length);
+        $('#accountAddress').text(addr);
         
         provider.getBalance(userAccount).then(balance => {
             userBalance = +ethers.utils.formatEther(balance);

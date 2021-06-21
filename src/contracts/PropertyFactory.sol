@@ -161,15 +161,15 @@ contract PropertyToken is IERC20 {
         _tokensOnAuction[addr] += amount;
     }
     
-    function getTotalOwnerAuctions(address addr) public view returns(uint256){
+    function getTotalOwnerAuctions(address addr) public view returns(uint256) {
         return _auction[addr].length;
     }
     
-    function getOwnerAuctions(address addr) public view returns(Price[] memory){
+    function getOwnerAuctions(address addr) public view returns(Price[] memory) {
         return _auction[addr];
     }
 
-    function getAuction(address addr, uint index) public view returns(Price memory){
+    function getAuction(address addr, uint index) public view returns(Price memory) {
         return _auction[addr][index];
     }
     
