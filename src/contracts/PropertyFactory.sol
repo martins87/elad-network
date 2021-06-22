@@ -149,7 +149,6 @@ contract PropertyToken is IERC20 {
         _allowances[tokenOwner][spender] = value;
         emit Approval(tokenOwner, spender, value);
     }
-    
 
     function addAuction(uint256 amount, uint256 price) public {
         _auction[msg.sender].push(Price(amount, price));
@@ -285,6 +284,10 @@ contract PropertyTokenFactory {
     
     function totalTokens() public view returns(uint256) {
         return numberOfTokens;
+    }
+    
+    function getTokens() public view returns (address[] memory) {
+        return tokens;
     }
     
     function getTokenAddress(uint8 index) public view returns (address) {

@@ -26,6 +26,7 @@ var userBalance;
 (() => {
     provider.listAccounts().then(accounts => {
         userAccount = accounts[0];
+		console.log('heeeeeeeeeeeeeeeeeeeeey');
 		
         provider.getBalance(userAccount).then(balance => {
 			userBalance = +ethers.utils.formatEther(balance);
@@ -37,6 +38,7 @@ var userBalance;
 const loadPropertyTokens = async () => {
     // first we get number of tokens created
     const totalTokens = await factoryInstance.totalTokens();
+	console.log('total tokens created:', totalTokens.toString());
 	
 	// now we get tokens addresses
 	for(let i = 0; i < totalTokens; i++) {
@@ -72,27 +74,27 @@ const loadPropertyTokens = async () => {
 		}
 		const propertyTokenInstance = new ethers.Contract(propertyTokenContract.address, propertyTokenContract.ABI, provider);
 
-		// finally we get data from each token
-		const tokenDetails = await propertyTokenInstance.propertyDetails();
-		console.log('Token details: ', tokenDetails);
-		[tokenName, tokenSymbol, totalSupply, tokensBought, tokensLeft, propertyOwner] = tokenDetails;
+		// // finally we get data from each token
+		// const tokenDetails = await propertyTokenInstance.propertyDetails();
+		// console.log('Token details: ', tokenDetails);
+		// [tokenName, tokenSymbol, totalSupply, tokensBought, tokensLeft, propertyOwner] = tokenDetails;
 
-		// populate table with token details
-		var table = document.getElementById("tokensTable");
-		var row = table.insertRow(1);
-		var cell0 = row.insertCell(0);
-		var cell1 = row.insertCell(1);
-		var cell2 = row.insertCell(2);
-		var cell3 = row.insertCell(3);
-		var cell4 = row.insertCell(4);
-		var cell5 = row.insertCell(5);
+		// // populate table with token details
+		// var table = document.getElementById("tokensTable");
+		// var row = table.insertRow(1);
+		// var cell0 = row.insertCell(0);
+		// var cell1 = row.insertCell(1);
+		// var cell2 = row.insertCell(2);
+		// var cell3 = row.insertCell(3);
+		// var cell4 = row.insertCell(4);
+		// var cell5 = row.insertCell(5);
 
-		cell0.innerHTML = tokenName + ' (' + tokenSymbol + ')';
-		cell1.innerHTML = totalSupply;
-		cell2.innerHTML = tokensBought;
-		cell3.innerHTML = tokensLeft;
-		cell4.innerHTML = "<a href=\"https://ropsten.etherscan.io/token/" + address + "\" target=\"_blank\">" + formatAddress(address) + "</a>&nbsp;&nbsp;<i class=\"fas fa-external-link-alt\"></i>";
-		cell5.innerHTML = "<a href=\"https://ropsten.etherscan.io/address/" + propertyOwner + "\" target=\"_blank\">" + formatAddress(propertyOwner) + "</a>&nbsp;&nbsp;<i class=\"fas fa-external-link-alt\"></i>";
+		// cell0.innerHTML = tokenName + ' (' + tokenSymbol + ')';
+		// cell1.innerHTML = totalSupply;
+		// cell2.innerHTML = tokensBought;
+		// cell3.innerHTML = tokensLeft;
+		// cell4.innerHTML = "<a href=\"https://ropsten.etherscan.io/token/" + address + "\" target=\"_blank\">" + formatAddress(address) + "</a>&nbsp;&nbsp;<i class=\"fas fa-external-link-alt\"></i>";
+		// cell5.innerHTML = "<a href=\"https://ropsten.etherscan.io/address/" + propertyOwner + "\" target=\"_blank\">" + formatAddress(propertyOwner) + "</a>&nbsp;&nbsp;<i class=\"fas fa-external-link-alt\"></i>";
 	}
 }
 

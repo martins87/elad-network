@@ -390,6 +390,25 @@ app.get('/dashboard', (req, res, next) => {
     }
 });
 
+app.get('/auctions', async (req, res) => {
+    // Checks if user is logged in. If not, redirects to login page.
+    if (typeof req.session.username === 'undefined' && useLogin) {
+        console.log('NOT LOGGED IN')
+        res.render('login', { title: 'Login' })
+    } else {
+        console.log('User:', req.session.username);
+
+        try {
+            res.render('auctions', {
+                title: 'Auctions',
+                user: req.session.username
+            });
+        } catch (error) {
+            // renderErrorPage(error, 'Error listing properties');
+        }
+    }
+});
+
 app.get('/properties', async (req, res) => {
     // Checks if user is logged in. If not, redirects to login page.
     if (typeof req.session.username === 'undefined' && useLogin) {
