@@ -69,7 +69,8 @@ const loadPropertyTokens = async () => {
 				'function myBalance() public view returns (uint256)',
 				'function tokensLeft() public view returns(uint256)',
 				'function propertyDetails() public view returns(string memory, string memory, uint256, uint256, uint256, address)',
-				'function getOwner() public view returns (address)'
+				'function getOwner() public view returns (address)',
+				'function getTotalAuctionOwners() public view returns (uint)'
 			]
 		}
 		const propertyTokenInstance = new ethers.Contract(propertyTokenContract.address, propertyTokenContract.ABI, provider);

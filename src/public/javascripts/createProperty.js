@@ -36,6 +36,7 @@ var userBalance;
 })();
 
 const createToken = async () => {
+	console.log('chegou no create token');
 	var propertyName = $('#_propertyName').val();
 	var propertyPrice = $('#_propertyPrice').val();
 	var propertyAddress = $('#_propertyAddress').val();

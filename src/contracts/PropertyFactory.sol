@@ -18,13 +18,15 @@ contract PropertyToken is IERC20 {
     uint8 public decimals;
     uint256 private _totalSupply;
     uint256 private _tokensBought;
+    address[] private _auctionOwnerAddresses;
     uint256 private _exchangeRate;
     address payable private _owner;
 
-    mapping(address => uint256) private _balances;
+    mapping (address => uint256) private _balances;
     mapping (address => mapping (address => uint256)) private _allowances;
     mapping (address => Price[]) private _auction;
     mapping (address => uint256) private _tokensOnAuction;
+    
 
     constructor(string memory _symbol, string memory _name, uint256 _initialSupply, address payable owner) public {
         symbol = _symbol;
@@ -35,6 +37,7 @@ contract PropertyToken is IERC20 {
         _owner = owner;
         _balances[_owner] = _totalSupply;
         addAuction(_owner, _totalSupply, 10000000000000000);
+        _auctionOwnerAddresses.push(owner);
         emit Transfer(address(0), _owner, _totalSupply);
     }
     
@@ -151,6 +154,7 @@ contract PropertyToken is IERC20 {
     }
 
     function addAuction(uint256 amount, uint256 price) public {
+        if (_auction[msg.sender].length == 0) _auctionOwnerAddresses.push(msg.sender);
         _auction[msg.sender].push(Price(amount, price));
         _tokensOnAuction[msg.sender] += amount;
     }
@@ -222,6 +226,7 @@ contract PropertyToken is IERC20 {
         _transfer(tokenOwner, msg.sender, amount);
         payable(tokenOwner).transfer(msg.value);
         
+        _tokensBought += amount;
         _auction[tokenOwner][index].amount -= amount;
         _tokensOnAuction[tokenOwner] -= amount;
         
@@ -254,6 +259,14 @@ contract PropertyToken is IERC20 {
      */
     function getOwner() public view returns (address) {
         return _owner;
+    }
+    
+    function getTotalAuctionOwners() public view returns (uint) {
+        return _auctionOwnerAddresses.length;
+    }
+    
+    function getAuctionOwners() public view returns (address[] memory) {
+        return _auctionOwnerAddresses;
     }
     
     /**
