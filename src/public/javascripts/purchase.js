@@ -12,10 +12,11 @@ var signer = new ethers.providers.Web3Provider(window.ethereum).getSigner();
 
 // Factory Contract
 const factoryContract = {
-	address: "0xC4C72feac3A285aCca89DbAc16e33ACe0afDBE48", // Ropsten
+	address: "0xbb5406fc4c5056070643621b5ac9f1dfd5d44eec", // Ropsten
 	ABI: [
 		'function createProperty(string memory _symbol, string memory _name, uint256 _supplyOfTokens, address payable _owner) public returns (address)',
 		'function totalTokens() public view returns(uint256)',
+		'function getTokens() public view returns (address[] memory)',
 		'function getTokenAddress(uint8 index) public view returns (address)'
 	]
 }
@@ -38,6 +39,7 @@ const propertyTokenContract = {
 		'function addAuction(uint256 amount, uint256 price) public',
 		'function addAuction(address addr, uint256 amount, uint256 price) private',
 		'function getTotalOwnerAuctions(address addr) public view returns(uint256)',
+		'function getOwnerAuctions(address addr) public view returns(Price[] memory)',
 		'function getAuction(address addr, uint index) public view returns(Price)',
 		'function getOwnerTokensOnAuction(address addr) public view returns(uint256)',
 		'function buyTokens() public payable',
@@ -46,7 +48,8 @@ const propertyTokenContract = {
 		'function tokensLeft() public view returns(uint256)',
 		'function propertyDetails() public view returns(string memory, string memory, uint256, uint256, uint256, address)',
 		'function getOwner() public view returns (address)',
-		'function getTotalAuctionOwners() public view returns (uint)'
+		'function getTotalAuctionOwners() public view returns (uint)',
+		'function getAuctionOwners() public view returns (address[] memory)'
 	]
 }
 var propertyTokenInstance = null;
@@ -135,7 +138,7 @@ const buyTokens = async () => {
 		// 		alert('Your token purchase transaction has been broadcasted.\ntx hash: ' + result)
 		// 	}
 		// })
-		alert('ryco');
+		alert('Token purchase submitted');
 	} else {
 		alert('Insufficient funds');
 	}

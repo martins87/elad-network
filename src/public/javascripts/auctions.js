@@ -11,10 +11,11 @@
 
 // Factory Contract
 const factoryContract = {
-	address: "0xC4C72feac3A285aCca89DbAc16e33ACe0afDBE48", // Ropsten
+	address: "0xbb5406fc4c5056070643621b5ac9f1dfd5d44eec", // Ropsten
 	ABI: [
 		'function createProperty(string memory _symbol, string memory _name, uint256 _supplyOfTokens, address payable _owner) public returns (address)',
 		'function totalTokens() public view returns(uint256)',
+		'function getTokens() public view returns (address[] memory)',
 		'function getTokenAddress(uint8 index) public view returns (address)'
 	]
 }
@@ -26,7 +27,6 @@ var userBalance;
 (() => {
     provider.listAccounts().then(accounts => {
         userAccount = accounts[0];
-		console.log('heeeeeeeeeeeeeeeeeeeeey');
 		
         provider.getBalance(userAccount).then(balance => {
 			userBalance = +ethers.utils.formatEther(balance);
@@ -34,20 +34,19 @@ var userBalance;
     });
 })();
 
-// get tokens addresses
-const loadPropertyTokens = async () => {
-    // first we get number of tokens created
-    const totalTokens = await factoryInstance.totalTokens();
-	console.log('total tokens created:', totalTokens.toString());
+const loadAuctions = async () => {
+    // first we get all tokens created
+    const tokens = await factoryInstance.getTokens();
+	console.log('[auctions.js] total tokens created:', tokens.length);
 	
-	// now we get tokens addresses
-	for(let i = 0; i < totalTokens; i++) {
-		let address = await factoryInstance.getTokenAddress(i);
-		console.log(`Token ${i} address:`, address);
-
+	// for every token created, we get all auctions
+	for(let i = 0; i < tokens.length; i++) {
+		let tokenAddress = tokens[i];
+		console.log(`[auctions.js] Token ${i} address:`, tokenAddress);
+		
 		// Property Token Contract
 		const propertyTokenContract = {
-			address: address,
+			address: tokenAddress,
 			ABI: [
 				'constructor(string memory _symbol, string memory _name, uint256 _initialSupply, address payable owner) public',
 				'function getTokensBought() public view returns(uint256)',
@@ -62,6 +61,7 @@ const loadPropertyTokens = async () => {
 				'function addAuction(uint256 amount, uint256 price) public',
 				'function addAuction(address addr, uint256 amount, uint256 price) private',
 				'function getTotalOwnerAuctions(address addr) public view returns(uint256)',
+				'function getOwnerAuctions(address addr) public view returns(Price[] memory)',
 				'function getAuction(address addr, uint index) public view returns(Price)',
 				'function getOwnerTokensOnAuction(address addr) public view returns(uint256)',
 				'function buyTokens() public payable',
@@ -70,32 +70,26 @@ const loadPropertyTokens = async () => {
 				'function tokensLeft() public view returns(uint256)',
 				'function propertyDetails() public view returns(string memory, string memory, uint256, uint256, uint256, address)',
 				'function getOwner() public view returns (address)',
-				'function getTotalAuctionOwners() public view returns (uint)'
+				'function getTotalAuctionOwners() public view returns (uint)',
+				'function getAuctionOwners() public view returns (address[] memory)'
 			]
 		}
 		const propertyTokenInstance = new ethers.Contract(propertyTokenContract.address, propertyTokenContract.ABI, provider);
-
-		// // finally we get data from each token
-		// const tokenDetails = await propertyTokenInstance.propertyDetails();
-		// console.log('Token details: ', tokenDetails);
-		// [tokenName, tokenSymbol, totalSupply, tokensBought, tokensLeft, propertyOwner] = tokenDetails;
-
-		// // populate table with token details
-		// var table = document.getElementById("tokensTable");
-		// var row = table.insertRow(1);
-		// var cell0 = row.insertCell(0);
-		// var cell1 = row.insertCell(1);
-		// var cell2 = row.insertCell(2);
-		// var cell3 = row.insertCell(3);
-		// var cell4 = row.insertCell(4);
-		// var cell5 = row.insertCell(5);
-
-		// cell0.innerHTML = tokenName + ' (' + tokenSymbol + ')';
-		// cell1.innerHTML = totalSupply;
-		// cell2.innerHTML = tokensBought;
-		// cell3.innerHTML = tokensLeft;
-		// cell4.innerHTML = "<a href=\"https://ropsten.etherscan.io/token/" + address + "\" target=\"_blank\">" + formatAddress(address) + "</a>&nbsp;&nbsp;<i class=\"fas fa-external-link-alt\"></i>";
-		// cell5.innerHTML = "<a href=\"https://ropsten.etherscan.io/address/" + propertyOwner + "\" target=\"_blank\">" + formatAddress(propertyOwner) + "</a>&nbsp;&nbsp;<i class=\"fas fa-external-link-alt\"></i>";
+		
+		// auction owners
+		let auctionOwners = await propertyTokenInstance.getAuctionOwners();
+		console.log(`[auctions.js] Auction owners:`, auctionOwners);
+		
+		// for every auction owner, get all auctions
+		for(let j = 0; j < auctionOwners.length; j++) {
+			let auctionOwner = auctionOwners[j] + "";
+			// let ownerAuctions = await propertyTokenInstance.getOwnerAuctions();
+			let totalOwnerAuctions = await propertyTokenInstance.getTotalOwnerAuctions(auctionOwner);
+			
+			console.log(`[auctions.js] Auction owner :`, auctionOwner);
+			console.log(`[auctions.js] total owner auctions :`, totalOwnerAuctions.toString());
+			// console.log(`[auctions.js] ${auctionOwner} auctions :`, ownerAuctions);
+		}
 	}
 }
 
@@ -107,4 +101,4 @@ const formatAddress = (address) => {
 	return address.substring(0, address.length/2.5) + '...';
 }
 
-loadPropertyTokens();
+loadAuctions();
