@@ -11,7 +11,7 @@
 
 // Factory Contract
 const factoryContract = {
-	address: "0xbb5406fc4c5056070643621b5ac9f1dfd5d44eec", // Ropsten
+	address: "0x8a9526df84fd69e2926ca6c5b4748a0ceb60430e", // Ropsten
 	ABI: [
 		'function createProperty(string memory _symbol, string memory _name, uint256 _supplyOfTokens, address payable _owner) public returns (address)',
 		'function totalTokens() public view returns(uint256)',
@@ -20,6 +20,8 @@ const factoryContract = {
 	]
 }
 const factoryInstance = new ethers.Contract(factoryContract.address, factoryContract.ABI, provider);
+
+console.log('[createProperty.js] Factory address:', factoryContract.address);
 
 var userAccount;
 var userBalance;
@@ -62,7 +64,7 @@ const loadAuctions = async () => {
 				'function addAuction(address addr, uint256 amount, uint256 price) private',
 				'function getTotalOwnerAuctions(address addr) public view returns(uint256)',
 				'function getOwnerAuctions(address addr) public view returns(Price[] memory)',
-				'function getAuction(address addr, uint index) public view returns(Price)',
+				'function getAuction(address addr, uint index) public view returns(uint256, uint256)',
 				'function getOwnerTokensOnAuction(address addr) public view returns(uint256)',
 				'function buyTokens() public payable',
 				'function buyFromAuction(address tokenOwner, uint index, uint256 amount) public payable',
@@ -83,12 +85,20 @@ const loadAuctions = async () => {
 		// for every auction owner, get all auctions
 		for(let j = 0; j < auctionOwners.length; j++) {
 			let auctionOwner = auctionOwners[j] + "";
-			// let ownerAuctions = await propertyTokenInstance.getOwnerAuctions();
 			let totalOwnerAuctions = await propertyTokenInstance.getTotalOwnerAuctions(auctionOwner);
+			totalOwnerAuctions = +totalOwnerAuctions.toString();
 			
 			console.log(`[auctions.js] Auction owner :`, auctionOwner);
-			console.log(`[auctions.js] total owner auctions :`, totalOwnerAuctions.toString());
-			// console.log(`[auctions.js] ${auctionOwner} auctions :`, ownerAuctions);
+			console.log(`[auctions.js] total owner auctions :`, totalOwnerAuctions);
+			
+			// get all owner auctions
+			for(let k = 0; k < totalOwnerAuctions; k++) {
+				let [amount, price] = await propertyTokenInstance.getAuction(auctionOwner, k);
+				amount = +amount.toString()
+				price = +price.toString()
+				console.log(`[auctions.js] Owner auction[${k}] amount:`, amount);
+				console.log(`[auctions.js] Owner auction[${k}] price:`, price);
+			}
 		}
 	}
 }

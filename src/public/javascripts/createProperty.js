@@ -11,7 +11,7 @@
 
 // Factory Contract
 const factoryContract = {
-	address: "0xbb5406fc4c5056070643621b5ac9f1dfd5d44eec", // Ropsten
+	address: "0x8a9526df84fd69e2926ca6c5b4748a0ceb60430e", // Ropsten
 	ABI: [
 		'function createProperty(string memory _symbol, string memory _name, uint256 _supplyOfTokens, address payable _owner) public returns (address)',
 		'function totalTokens() public view returns(uint256)',
@@ -27,11 +27,11 @@ var userBalance;
 (() => {
     provider.listAccounts().then(accounts => {
         userAccount = accounts[0];
-		console.log('[createProperty.js] account:', userAccount);
+		// console.log('[createProperty.js] account:', userAccount);
     
         provider.getBalance(userAccount).then(balance => {
             userBalance = +ethers.utils.formatEther(balance);
-			console.log('[createProperty.js] balance:', userBalance);
+			// console.log('[createProperty.js] balance:', userBalance);
         });
     });
 })();
