@@ -40,7 +40,7 @@ const loadAuctions = async () => {
     // first we get all tokens created
     const tokens = await factoryInstance.getTokens();
 	console.log('[auctions.js] total tokens created:', tokens.length);
-	
+
 	// for every token created, we get all auctions
 	for(let i = 0; i < tokens.length; i++) {
 		let tokenAddress = tokens[i];
@@ -93,6 +93,16 @@ const loadAuctions = async () => {
 			
 			// get all owner auctions
 			for(let k = 0; k < totalOwnerAuctions; k++) {
+				document.getElementById("totalAuctions").value = totalOwnerAuctions;
+				let numOfAuctions = document.getElementById("totalAuctions").value;
+
+				for (let d = 0; d < numOfAuctions; d++) {
+					let buttons = document.getElementById("buttons");
+					let btn = document.createElement("button");
+					btn.innerHTML = `Auction ${d}`;
+					buttons.appendChild(btn);
+				}
+
 				let [amount, price] = await propertyTokenInstance.getAuction(auctionOwner, k);
 				amount = +amount.toString()
 				price = +price.toString()
