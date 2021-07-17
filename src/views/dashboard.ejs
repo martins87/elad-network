@@ -34,6 +34,53 @@
         </div>
         <br>
       </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="auctionPurchaseModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel2" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2 class="modal-title" id="exampleModalLabel2">Buy ejs tokens</h2>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+
+          <br>
+
+          <div class="container">
+            <table class="table align-items-center">
+              <thead class="thead-light">
+                <tr>
+                  <th scope="col">Total supply</th>
+                  <th scope="col">Tokens left</th>
+                  <th scope="col">My balance</th>
+                  <th scope="col">ejs token price</th>
+                </tr>
+              </thead>
+              <tbody class="list">
+                <tr>
+                  <td><span id="totalSupply_2-2"></td>
+                  <td><span id="tokensLeft_2-2"></td>
+                  <td><span id="myBalance_2-2"></td>
+                  <td>0.01 ETH</td>
+                </tr>
+            </table>
+          </div>
+
+
+          <div class="modal-body">
+            <p>Account balance: <span id="ethBalance-2"></span></p>
+            <input class="form-control" type="number" id="ethAmount2-2" name="propertyImage" placeholder="Amount of ETH to send..." required>
+          </div>
+          
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-success" data-dismiss="modal" onclick="buyTokens()">Buy</button>
+          </div>
+        </div>
+      </div>
+    </div>
     
     <!-- End of div main-content  -->
     </div>

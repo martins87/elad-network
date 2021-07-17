@@ -11,7 +11,7 @@
 
 // Factory Contract
 const factoryContract = {
-	address: "0x8a9526df84fd69e2926ca6c5b4748a0ceb60430e", // Ropsten
+	address: "0x18cf8a1fE734c7d1782b0E41dF2aAFb41FAFB9Be", // Ropsten
 	ABI: [
 		'function createProperty(string memory _symbol, string memory _name, uint256 _supplyOfTokens, address payable _owner) public returns (address)',
 		'function totalTokens() public view returns(uint256)',
@@ -81,7 +81,7 @@ const loadPropertyTokens = async () => {
 
 			cell0.innerHTML = tokenName + ' (' + tokenSymbol + ')';
 			cell1.innerHTML = totalSupply;
-			cell2.innerHTML = userBalance;
+			cell2.innerHTML = userBalance + "<button class=\"btn\" href=\"#\" data-toggle=\"modal\" data-target=\"#auctionPurchaseModal\">Add Auction</button>";
 			cell3.innerHTML = tokensLeft;
 			cell4.innerHTML = "<a href=\"https://ropsten.etherscan.io/token/" + address + "\" target=\"_blank\">" + address + "</a>&nbsp;&nbsp;<i class=\"fas fa-external-link-alt\"></i>"
 		}

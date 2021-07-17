@@ -9,7 +9,7 @@ const provider = new ethers.providers.Web3Provider(window.ethereum);
 
 // Factory Contract
 const factoryContract = {
-	address: "0xbb5406fc4c5056070643621b5ac9f1dfd5d44eec", // Ropsten
+	address: "0x18cf8a1fE734c7d1782b0E41dF2aAFb41FAFB9Be", // Ropsten
 	ABI: [
 		'function createProperty(string memory _symbol, string memory _name, uint256 _supplyOfTokens, address payable _owner) public returns (address)',
 		'function totalTokens() public view returns(uint256)',
