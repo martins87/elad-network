@@ -27,25 +27,25 @@ var userAccount;
 var userBalance;
 
 (() => {
-    provider.listAccounts().then(accounts => {
-        userAccount = accounts[0];
-		
-        provider.getBalance(userAccount).then(balance => {
+	provider.listAccounts().then(accounts => {
+		userAccount = accounts[0];
+
+		provider.getBalance(userAccount).then(balance => {
 			userBalance = +ethers.utils.formatEther(balance);
-        });
-    });
+		});
+	});
 })();
 
 const loadAuctions = async () => {
-    // first we get all tokens created
-    const tokens = await factoryInstance.getTokens();
+	// first we get all tokens created
+	const tokens = await factoryInstance.getTokens();
 	console.log('[auctions.js] total tokens created:', tokens.length);
 
 	// for every token created, we get all auctions
-	for(let i = 0; i < tokens.length; i++) {
+	for (let i = 0; i < tokens.length; i++) {
 		let tokenAddress = tokens[i];
 		console.log(`[auctions.js] Token ${i} address:`, tokenAddress);
-		
+
 		// Property Token Contract
 		const propertyTokenContract = {
 			address: tokenAddress,
@@ -77,48 +77,68 @@ const loadAuctions = async () => {
 			]
 		}
 		const propertyTokenInstance = new ethers.Contract(propertyTokenContract.address, propertyTokenContract.ABI, provider);
-		
+
 		// auction owners
 		let auctionOwners = await propertyTokenInstance.getAuctionOwners();
 		console.log(`[auctions.js] Auction owners:`, auctionOwners);
-		
+
+		// finally we get data from each token
+		const tokenDetails = await propertyTokenInstance.propertyDetails();
+		[tokenName, tokenSymbol, totalSupply, tokensBought, tokensLeft, propertyOwner] = tokenDetails;
+
 		// for every auction owner, get all auctions
-		for(let j = 0; j < auctionOwners.length; j++) {
+		for (let j = 0; j < auctionOwners.length; j++) {
 			let auctionOwner = auctionOwners[j] + "";
 			let totalOwnerAuctions = await propertyTokenInstance.getTotalOwnerAuctions(auctionOwner);
 			totalOwnerAuctions = +totalOwnerAuctions.toString();
-			
+
 			console.log(`[auctions.js] Auction owner :`, auctionOwner);
 			console.log(`[auctions.js] total owner auctions :`, totalOwnerAuctions);
-			
+
 			// get all owner auctions
-			for(let k = 0; k < totalOwnerAuctions; k++) {
+			for (let k = 0; k < totalOwnerAuctions; k++) {
 				document.getElementById("totalAuctions").value = totalOwnerAuctions;
 				let numOfAuctions = document.getElementById("totalAuctions").value;
-
-				for (let d = 0; d < numOfAuctions; d++) {
-					let buttons = document.getElementById("buttons");
-					let btn = document.createElement("button");
-					btn.innerHTML = `Auction ${d}`;
-					buttons.appendChild(btn);
-				}
 
 				let [amount, price] = await propertyTokenInstance.getAuction(auctionOwner, k);
 				amount = +amount.toString()
 				price = +price.toString()
 				console.log(`[auctions.js] Owner auction[${k}] amount:`, amount);
 				console.log(`[auctions.js] Owner auction[${k}] price:`, price);
+
+				let cardContent = `
+				<div class="card bg-white auction-card" style="width: 20rem; height:400px; max-height:450px; min-height:450px">
+					<img class="card-img-top" src="https://blog.architizer.com/wp-content/uploads/111W57__Symmetry_Hrero__FINAL_.0.jpg" alt="Card image cap">
+					<div class="card-body">
+					<h2 class="token-name">${formatTokenName(tokenName)}</h2>
+					<div class="auction-owner">${tokenSymbol} Token: ${formatOwnerAddress(tokenAddress)}</div>
+					<div class="auction-owner">Owner: ${formatOwnerAddress(auctionOwner)}</div>
+					<span id="propertyAddress"></span>
+					<h3 style="color:#000099">${amount} @ ${price}</h3>
+					<a href="#" class="btn btn-success">See auction</a>
+					</div>
+				</div>
+				`;
+
+				let auctions = document.getElementById("auctions");
+				let card = document.createElement("div");
+				card.innerHTML = cardContent;
+				auctions.appendChild(card);
 			}
 		}
 	}
 }
 
 const formatNumber = (number) => {
-    return number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
+	return number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
 }
 
-const formatAddress = (address) => {
-	return address.substring(0, address.length/2.5) + '...';
+const formatOwnerAddress = (address) => {
+	return address.substring(0, 6) + '...' + address.substring(address.length-4, address.length);
+}
+
+const formatTokenName = (name) => {
+	return name.length > 24 ? name.substring(0, 24) + '...' : name;
 }
 
 loadAuctions();

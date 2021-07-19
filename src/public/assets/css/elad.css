@@ -4,3 +4,25 @@
     color: white;
     margin-left: 10px;
 }
+
+.i-group {
+    margin-top: -20px;
+}
+
+.balance {
+    margin-bottom: 10px;
+}
+
+
+.auction-label {
+    font-size: 14px;
+    margin-bottom: -2px;
+}
+
+.auction-card{
+    margin: 12px;
+}
+
+.auction-owner {
+    margin: auto;
+}

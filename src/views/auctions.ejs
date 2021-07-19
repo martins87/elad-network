@@ -7,7 +7,7 @@
           
           <div hidden id="totalAuctions"></div>
           <div class="container">
-            <% if(true){ %>
+            <% if(false){ %>
               <div class="text-center">
                 <div class="container">
                   <!-- <div class="card shadow py-5" style="width: 1200px; height:1200px"> -->
@@ -17,27 +17,11 @@
                   </div>
                 </div>
               </div>
-            <% } else{ %>
-              <div class="row">
-                <% for(let i = 0; i < 2; i++) { %>
-                  <div class="col-md-4 p-2">
-                    <div class="card bg-white" style="width: 20rem; height:400px; max-height:450px; min-height:450px">
-                      <img class="card-img-top" src="https://blog.architizer.com/wp-content/uploads/111W57__Symmetry_Hrero__FINAL_.0.jpg" alt="Card image cap">
-                      <div class="card-body">
-                        <h2 class="card-title">Steinway Tower</h2>
-                        <span id="propertyAddress"></span>
-                        <p>
-                          <img src="../assets/img/icons/pin.png" class="img-fluid" alt="Responsive image" width="13px">&nbsp;
-                          5th Avenue
-                        </p>
-                        <h1 style="color:#000099">$50,000,000</h1>
-                        <a href="#" class="btn btn-success">See auction</a>
-                      </div>
-                    </div>
-                  </div>
-                <% } %>
+            <% } else { %>
+              <div class="row" id="auctions">
               </div>
             <% } %>
+
           <!-- Container -> end-->
           </div>
           
