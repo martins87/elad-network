@@ -21,7 +21,7 @@ const factoryContract = {
 }
 const factoryInstance = new ethers.Contract(factoryContract.address, factoryContract.ABI, provider);
 
-console.log('[createProperty.js] Factory address:', factoryContract.address);
+console.log('[auctions.js] Factory address:', factoryContract.address);
 
 var userAccount;
 var userBalance;
@@ -114,7 +114,7 @@ const loadAuctions = async () => {
 					<div class="auction-owner">${tokenSymbol} Token: ${formatOwnerAddress(tokenAddress)}</div>
 					<div class="auction-owner">Owner: ${formatOwnerAddress(auctionOwner)}</div>
 					<span id="propertyAddress"></span>
-					<h3 style="color:#000099">${amount} @ ${price}</h3>
+					<h3 style="color:#000099">${amount} @ ${formatTokenPrice(price)} ETH</h3>
 					<a href="#" class="btn btn-success">See auction</a>
 					</div>
 				</div>
@@ -139,6 +139,11 @@ const formatOwnerAddress = (address) => {
 
 const formatTokenName = (name) => {
 	return name.length > 24 ? name.substring(0, 24) + '...' : name;
+}
+
+const formatTokenPrice = (price) => {
+	console.log('price in ETH:', price/(10**18))
+	return price/(10**18);
 }
 
 loadAuctions();
